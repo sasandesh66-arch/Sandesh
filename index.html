@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sandesh - Cyber Link</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Orbitron', sans-serif; }
+        #ui { position: absolute; top: 20px; left: 20px; color: #00f2ff; pointer-events: none; }
+        .btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+               padding: 15px 40px; background: #00f2ff; border: none; color: #000; 
+               font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 0 20px #00f2ff; }
+        video { position: absolute; bottom: 10px; right: 10px; width: 120px; border: 1px solid #00f2ff; transform: scaleX(-1); }
+        /* Creating a glowing text effect for the overlay name */
+        #name-overlay {
+            position: absolute; width: 100%; text-align: center; top: 40%;
+            font-size: 80px; font-weight: bold; color: #00f2ff;
+            text-shadow: 0 0 20px #00f2ff, 0 0 40px #00f2ff;
+            pointer-events: none; letter-spacing: 15px; opacity: 0.8;
+            display: none;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="ui">
+    <h2>USER_ID: SANDESH</h2>
+    <p id="status">STATUS: OFFLINE</p>
+</div>
+
+<div id="name-overlay">SANDESH</div>
+
+<button class="btn" id="start-btn" onclick="initializeSystem()">INITIALIZE SANDESH_LINK</button>
+<video id="webcam" playsinline></video>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script>
+let scene, camera, renderer, crystalGroup, nameMesh;
+
+function setup3D() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    crystalGroup = new THREE.Group();
+    scene.add(crystalGroup);
+
+    // Create a "Crystalline Shield" around the name
+    for(let i=0; i<12; i++) {
+        const geometry = new THREE.IcosahedronGeometry(2, 0);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x00f2ff, 
+            wireframe: true, 
+            transparent: true, 
+            opacity: 0.1 + (i * 0.05) 
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
+        crystalGroup.add(mesh);
+    }
+
+    animate();
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    crystalGroup.rotation.y += 0.005;
+    crystalGroup.rotation.z += 0.002;
+    renderer.render(scene, camera);
+}
+
+async function initializeSystem() {
+    document.getElementById('start-btn').style.display = 'none';
+    document.getElementById('name-overlay').style.display = 'block';
+    document.getElementById('status').innerText = "STATUS: SYNCING...";
+    
+    setup3D();
+
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 0 });
+
+    hands.onResults((res) => {
+        if (res.multiHandLandmarks && res.multiHandLandmarks[0]) {
+            const lm = res.multiHandLandmarks[0];
+            document.getElementById('status').innerText = "STATUS: LINK_ACTIVE";
+            
+            // 1. Hand Position moves the 3D Name Crystal
+            const tx = (0.5 - lm[9].x) * 8;
+            const ty = (0.5 - lm[9].y) * 6;
+            crystalGroup.position.x += (tx - crystalGroup.position.x) * 0.1;
+            crystalGroup.position.y += (ty - crystalGroup.position.y) * 0.1;
+
+            // 2. Map Name Overlay to follow 3D center
+            const nameEl = document.getElementById('name-overlay');
+            nameEl.style.transform = `translate(${tx * 20}px, ${-ty * 20}px)`;
+
+            // 3. Pinch Gesture = Glow Pulse
+            const pinchDist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
+            if(pinchDist < 0.05) {
+                nameEl.style.color = "#ffffff";
+                nameEl.style.textShadow = "0 0 50px #fff, 0 0 100px #00f2ff";
+                crystalGroup.scale.set(1.2, 1.2, 1.2);
+            } else {
+                nameEl.style.color = "#00f2ff";
+                nameEl.style.textShadow = "0 0 20px #00f2ff";
+                crystalGroup.scale.set(1, 1, 1);
+            }
+        }
+    });
+
+    const videoElement = document.getElementById('webcam');
+    const cameraHelper = new Camera(videoElement, {
+        onFrame: async () => { await hands.send({image: videoElement}); },
+        width: 480, height: 360
+    });
+    cameraHelper.start();
+}
+</script>
+</body>
+</html>
