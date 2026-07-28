@@ -615,14 +615,14 @@
        ========================================================================== -->
   <div id="intro-overlay">
     <video id="intro-video" autoplay muted playsinline>
-      <source src="https://github.com/sasandesh66-arch/Sandesh/blob/main/assets/lv_0_20260728115009.mp4" type="video/mp4">
+      <source src="assets/lv_0_20260728115009.mp4" type="video/mp4">
     </video>
     <div class="skip-prompt">Press SPACE or Click to Skip</div>
   </div>
 
   <!-- FIXED NAVIGATION & PRESENTER HUD -->
   <nav class="top-nav">
-    <img src="https://github.com/sasandesh66-arch/Sandesh/blob/main/assets/Picsart_26-07-28_00-56-51-694.png" alt="VerDiA Logo" class="brand-logo">
+    <img src="assets/Picsart_26-07-28_00-56-51-694.png" alt="VerDiA Logo" class="brand-logo">
   </nav>
 
   <div class="presenter-hud">
@@ -654,7 +654,7 @@
           </p>
         </div>
         <div class="hero-img-wrap reveal delay-2">
-          <img src="https://github.com/sasandesh66-arch/Sandesh/blob/main/assets/59763.png" alt="VerDiA BloomPen Terra Edition Hero">
+          <img src="assets/59763.png" alt="VerDiA BloomPen Terra Edition Hero">
         </div>
       </div>
     </section>
@@ -675,7 +675,7 @@
     <section id="slide-3">
       <div class="reveal-grid">
         <div class="floating-product reveal">
-          <img src="https://github.com/sasandesh66-arch/Sandesh/blob/main/assets/59685-removebg-preview.png" alt="BloomPen Product Render" style="max-height: 65vh;">
+          <img src="assets/59685-removebg-preview.png" alt="BloomPen Product Render" style="max-height: 65vh;">
         </div>
         <div>
           <span class="section-tag reveal">Sustainable Engineering</span>
@@ -710,7 +710,7 @@
         
         <div class="details-interactive reveal delay-2" style="margin: 0 auto;">
           <div class="details-img-container">
-            <img src="https://github.com/sasandesh66-arch/Sandesh/blob/main/assets/59687-removebg-preview.png" alt="BloomPen Close Up">
+            <img src="assets/59687-removebg-preview.png" alt="BloomPen Close Up">
             
             <!-- Hotspot 1: Graphite Nib -->
             <div class="hotspot hs-nib"></div>
@@ -778,7 +778,7 @@
             </div>
             <div class="video-frame reveal delay-2">
             <video id="growth-video" muted playsinline preload="auto">
-            <source src="https://github.com/sasandesh66-arch/Sandesh/blob/main/assets/634969515_1785227179024768.mp4" type="video/mp4">
+            <source src="assets/634969515_1785227179024768.mp4" type="video/mp4">
             </video>
             </div>
             </div>
@@ -788,7 +788,7 @@
             <section id="slide-7">
             <div class="packaging-layout">
             <div class="reveal">
-            <img src="https://github.com/sasandesh66-arch/Sandesh/blob/main/assets/1785236222613.png" alt="VerDiA Packaging Kit" style="max-height: 60vh;">
+            <img src="assets/1785236222613.png" alt="VerDiA Packaging Kit" style="max-height: 60vh;">
             </div>
             <div>
             <span class="section-tag reveal">Unboxing Innovation</span>
@@ -1007,6 +1007,19 @@
             e.preventDefault();
             isMuted = !isMuted;
             if (growthVideo) growthVideo.muted = isMuted;
+            if (introVideo) introVideo.muted = isMuted;
+            break;
+            
+            case 'KeyR': // [R] Restart Presentation
+            e.preventDefault();
+            navigateToSlide(0);
+            break;
+            }
+            });
+            });
+            </script>
+            </body>
+            </html> if (growthVideo) growthVideo.muted = isMuted;
             if (introVideo) introVideo.muted = isMuted;
             break;
             
