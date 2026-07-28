@@ -150,19 +150,44 @@
       object-fit: cover;
     }
 
-    .skip-prompt {
+    .skip-prompt-wrap {
       position: absolute;
       bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 10000;
+    }
+
+    .skip-btn {
+      background: rgba(22, 46, 35, 0.85);
+      color: var(--text-white);
+      border: 1px solid var(--accent-sage);
+      padding: 0.6rem 1.4rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      backdrop-filter: blur(8px);
+      transition: var(--transition-smooth);
+    }
+
+    .skip-btn:hover {
+      background: var(--accent-sage);
+      color: var(--bg-forest);
+    }
+
+    .skip-prompt {
       font-size: 0.8rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.6);
       background: rgba(0, 0, 0, 0.4);
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1rem;
       border-radius: 20px;
       backdrop-filter: blur(5px);
       border: 1px solid rgba(255,255,255,0.1);
-      pointer-events: none;
     }
 
     /* ==========================================================================
@@ -181,9 +206,11 @@
       pointer-events: none;
     }
 
+    /* INCREASED LOGO SIZE FOR HIGH STAGE VISIBILITY */
     .top-nav .brand-logo {
-      height: 32px;
+      height: 64px;
       pointer-events: auto;
+      transition: transform 0.3s ease;
     }
 
     .presenter-hud {
@@ -456,7 +483,7 @@
       margin-bottom: 1rem;
     }
 
-    /* Growth Story Section */
+    /* Growth Story & Video Showcase Sections */
     .video-showcase {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -570,7 +597,7 @@
     }
 
     .final-logo {
-      height: 60px;
+      height: 90px;
       margin-bottom: 2.5rem;
     }
 
@@ -584,6 +611,9 @@
 
     /* RESPONSIVE DESIGN */
     @media (max-width: 900px) {
+      .top-nav .brand-logo {
+        height: 48px;
+      }
       .hero-layout, .reveal-grid, .video-showcase, .packaging-layout, .comparison-grid {
         grid-template-columns: 1fr;
         gap: 2rem;
@@ -611,13 +641,16 @@
 <body>
 
   <!-- ==========================================================================
-       INTRO OVERLAY (Auto-fade timer + Manual Skip)
+       INTRO OVERLAY (Auto-fade timer + Manual Skip & Start Button)
        ========================================================================== -->
   <div id="intro-overlay">
     <video id="intro-video" autoplay muted playsinline>
-      <source src="assets/lv_0_20260728115009.mp4" type="video/mp4">
+      <source src="assets/14140096_1785265876398524.mp4" type="video/mp4">
     </video>
-    <div class="skip-prompt">Press SPACE or Click to Skip</div>
+    <div class="skip-prompt-wrap">
+      <button class="skip-btn" id="skip-btn">Start Presentation &rarr;</button>
+      <div class="skip-prompt">Press SPACE to Skip</div>
+    </div>
   </div>
 
   <!-- FIXED NAVIGATION & PRESENTER HUD -->
@@ -626,7 +659,7 @@
   </nav>
 
   <div class="presenter-hud">
-    <span class="hud-counter" id="hud-counter">01 / 10</span>
+    <span class="hud-counter" id="hud-counter">01 / 11</span>
     <div class="hud-controls">
       <button class="hud-btn" id="prev-btn" title="Previous (Up Arrow)">&#8593;</button>
       <button class="hud-btn" id="next-btn" title="Next (Down Arrow)">&#8595;</button>
@@ -634,7 +667,7 @@
   </div>
 
   <div class="key-hints">
-    [&uarr;/&darr;] Navigate &nbsp;|&nbsp; [F] Fullscreen &nbsp;|&nbsp; [M] Mute &nbsp;|&nbsp; [R] Reset
+    [&uarr;/&darr;] Navigate &nbsp;|&nbsp; [P] Play/Pause &nbsp;|&nbsp; [F] Fullscreen &nbsp;|&nbsp; [M] Mute &nbsp;|&nbsp; [R] Reset
   </div>
 
   <!-- ==========================================================================
@@ -704,332 +737,375 @@
 
     <!-- SLIDE 4: PRODUCT DETAILS (Interactive Hotspots) -->
     <section id="slide-4">
-      <div style="text-align: center; width: 100%;">
-        <span class="section-tag reveal">Precision Architecture</span>
-        <h2 class="reveal delay-1" style="font-size: 2.2rem; margin-bottom: 2.5rem;">Anatomy of Innovation</h2>
-        
-        <div class="details-interactive reveal delay-2" style="margin: 0 auto;">
-          <div class="details-img-container">
-            <img src="assets/59687-removebg-preview.png" alt="BloomPen Close Up">
-            
-            <!-- Hotspot 1: Graphite Nib -->
-            <div class="hotspot hs-nib"></div>
-            <div class="hotspot-card" style="top: 10%; left: 0%;">
-              <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Smooth Graphite Core</h4>
-              <p style="font-size: 0.8rem;">Non-toxic, high-density graphite engineered for precision writing without breakage.</p>
-            </div>
-
-            <!-- Hotspot 2: Wooden Body -->
-            <div class="hotspot hs-body"></div>
-            <div class="hotspot-card" style="top: 30%; left: 30%;">
-              <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Sustainably Sourced Cedar</h4>
-              <p style="font-size: 0.8rem;">Chemical-free, polished natural wood body designed for comfortable grip.</p>
-            </div>
-
-            <!-- Hotspot 3: Seed Capsule -->
-            <div class="hotspot hs-capsule"></div>
-            <div class="hotspot-card" style="top: 55%; left: 60%;">
-            <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Biodegradable Capsule</h4>
-            <p style="font-size: 0.8rem;">Activates instantly upon exposure to moisture and soil nutrients.</p>
-            </div>
-            </div>
-            </div>
-            </div>
-            </section>
-            
-            <!-- SLIDE 5: HOW IT WORKS -->
-            <section id="slide-5">
-            <div style="max-width: 1200px; width: 100%; text-align: center;">
-            <span class="section-tag reveal">User Experience</span>
-            <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Circular Journey</h2>
-            
-            <div class="process-flow">
-            <div class="process-step reveal delay-1">
-            <span class="step-num">01</span>
-            <h3 class="step-title">Write</h3>
-            <p>Use the BloomPen standardly for sketching, note-taking, and capturing ideas until it reaches its stub.</p>
-            </div>
-            <div class="process-step reveal delay-2">
-            <span class="step-num">02</span>
-            <h3 class="step-title">Plant</h3>
-            <p>Insert the green capsule stub directly into moist soil at a 45-degree angle in sunlight.</p>
-            </div>
-            <div class="process-step reveal delay-3">
-            <span class="step-num">03</span>
-            <h3 class="step-title">Grow</h3>
-            <p>Water regularly. The capsule dissolves within 48 hours, sprouting vibrant herbs or flora.</p>
-            </div>
-            </div>
-            </div>
-            </section>
-            
-            <!-- SLIDE 6: GROWTH STORY (Video Segment) -->
-            <section id="slide-6">
-            <div class="video-showcase">
-            <div>
-            <span class="section-tag reveal">Life Cycle Transformation</span>
-            <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">From Thought to Living Nature.</h2>
-            <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-            Watch the transition unfold. When your pencil reaches the end of its functional life, its secondary journey begins.
-            </p>
-            <p class="reveal delay-3" style="color: var(--accent-sage);">
-            "Decomposition gives way to living flora."
-            </p>
-            </div>
-            <div class="video-frame reveal delay-2">
-            <video id="growth-video" muted playsinline preload="auto">
-            <source src="assets/634969515_1785227179024768.mp4" type="video/mp4">
-            </video>
-            </div>
-            </div>
-            </section>
-            
-            <!-- SLIDE 7: PACKAGING EXPERIENCE -->
-            <section id="slide-7">
-            <div class="packaging-layout">
-            <div class="reveal">
-            <img src="assets/1785236222613.png" alt="VerDiA Packaging Kit" style="max-height: 60vh;">
-            </div>
-            <div>
-            <span class="section-tag reveal">Unboxing Innovation</span>
-            <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 1.5rem;">The VerDiA Growth Kit</h2>
-            <p class="reveal delay-2" style="margin-bottom: 1.5rem;">
-            Every edition arrives in 100% biodegradable, seed-infused packaging paper. Unbox a sleek, plastic-free presentation designed to make sustainability feel luxurious.
-            </p>
-            <ul class="reveal delay-3" style="list-style: none; line-height: 2;">
-            <li>&#10003; Minimum 5 Terra Edition Pencils</li>
-            <li>&#10003; Soil Activation Guide included</li>
-            <li>&#10003; Zero synthetic adhesives or plastic foils</li>
-            </ul>
-            </div>
-            </div>
-            </section>
-            
-            <!-- SLIDE 8: WHY BLOOMPEN IS DIFFERENT (Comparison Matrix) -->
-            <section id="slide-8">
-            <div style="text-align: center; width: 100%;">
-            <span class="section-tag reveal">Market Advantage</span>
-            <h2 class="reveal delay-1" style="font-size: 2.5rem;">Why BloomPen Matters</h2>
-            
-            <div class="comparison-grid reveal delay-2" style="margin: 0 auto;">
-            <div class="comp-card bad">
-            <h3><span style="color: #FF6B6B;">&#10007;</span> Traditional Pencil</h3>
-            <ul class="comp-list">
-            <li><span style="color: #FF6B6B;">&bull;</span> Extracted from virgin timber forests</li>
-            <li><span style="color: #FF6B6B;">&bull;</span> Ends as landfilled toxic stub waste</li>
-            <li><span style="color: #FF6B6B;">&bull;</span> Synthetic rubber and metal ferrules</li>
-            <li><span style="color: #FF6B6B;">&bull;</span> Linear consumable mindset</li>
-            </ul>
-            </div>
-            <div class="comp-card good">
-            <h3><span style="color: var(--accent-sage);">&#10004;</span> BloomPen Terra</h3>
-            <ul class="comp-list">
-            <li><span style="color: var(--accent-sage);">&bull;</span> Reclaimed cedar & non-toxic lead</li>
-            <li><span style="color: var(--accent-sage);">&bull;</span> Grows into organic flora after use</li>
-            <li><span style="color: var(--accent-sage);">&bull;</span> 100% compostable capsule core</li>
-            <li><span style="color: var(--accent-sage);">&bull;</span> Circular regenerative ecosystem</li>
-            </ul>
-            </div>
-            </div>
-            </div>
-            </section>
-            
-            <!-- SLIDE 9: BRAND STORY & LOGO DNA -->
-            <section id="slide-9">
-            <div style="text-align: center; max-width: 1100px; width: 100%;">
-            <span class="section-tag reveal">Identity Architecture</span>
-            <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Meaning Behind Our Logo</h2>
-            
-            <div class="brand-story-grid">
-            <div class="dna-item reveal delay-1">
-            <span class="dna-icon">&#9997;</span>
-            <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Pencil Nib</h3>
-            <p style="font-size: 0.9rem;">Symbolizing <strong>Knowledge</strong>, creativity, human expression, and education.</p>
-            </div>
-            <div class="dna-item reveal delay-2">
-            <span class="dna-icon">&#127811;</span>
-            <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Leaves</h3>
-            <p style="font-size: 0.9rem;">Symbolizing <strong>Nature</strong>, environmental responsibility, and ecological balance.</p>
-            </div>
-            <div class="dna-item reveal delay-3">
-            <span class="dna-icon">&#127793;</span>
-            <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Seed</h3>
-            <p style="font-size: 0.9rem;">Symbolizing <strong>Growth</strong>, potential, future impact, and regenerative design.</p>
-            </div>
-            </div>
-            </div>
-            </section>
-            
-            <!-- SLIDE 10: FINAL VISION -->
-            <section id="slide-10">
-            <div class="final-content">
-            <img src="https://files.catbox.moe/e9tm0k.png" alt="VerDiA" class="final-logo reveal">
-            <h2 class="final-quote reveal delay-1">"Every idea has the power to grow."</h2>
-            <p class="reveal delay-2" style="font-size: 1.2rem; color: var(--accent-sage-light); margin-bottom: 2rem;">
-            Thank you. Join us in shaping a regenerative future.
-            </p>
-            <span class="section-tag reveal delay-3" style="letter-spacing: 0.4em;">VerDiA &bull; Student Innovation 2026</span>
-            </div>
-            </section>
-            
-            </main>
-            
-            <!-- ==========================================================================
-            JAVASCRIPT: CONTROLS, ANIMATIONS & STAGE MECHANICS
-            ========================================================================== -->
-            <script>
-            document.addEventListener('DOMContentLoaded', () => {
-            // Elements
-            const introOverlay = document.getElementById('intro-overlay');
-            const introVideo = document.getElementById('intro-video');
-            const container = document.getElementById('scroll-container');
-            const sections = document.querySelectorAll('section');
-            const hudCounter = document.getElementById('hud-counter');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const growthVideo = document.getElementById('growth-video');
-            
-            let currentIndex = 0;
-            let isMuted = false;
-            
-            /* ----------------------------------------------------------------------
-            1. INTRO OVERLAY LOGIC (Auto-fade + Manual Skip)
-            ---------------------------------------------------------------------- */
-            const dismissIntro = () => {
-            if (!introOverlay.classList.contains('fade-out')) {
-            introOverlay.classList.add('fade-out');
-            setTimeout(() => introOverlay.remove(), 1200);
-            }
-            };
-            
-            // Auto dismiss after 6.5 seconds max
-            const autoSkipTimer = setTimeout(dismissIntro, 6500);
-            
-            // Dismiss on video end
-            if (introVideo) {
-            introVideo.addEventListener('ended', dismissIntro);
-            }
-            
-            // Manual dismiss on click or space
-            introOverlay.addEventListener('click', () => {
-            clearTimeout(autoSkipTimer);
-            dismissIntro();
-            });
-            
-            /* ----------------------------------------------------------------------
-            2. NAVIGATION & HUD UPDATES
-            ---------------------------------------------------------------------- */
-            const updateHUD = (index) => {
-            const formattedCurrent = String(index + 1).padStart(2, '0');
-            const formattedTotal = String(sections.length).padStart(2, '0');
-            hudCounter.textContent = `${formattedCurrent} / ${formattedTotal}`;
-            };
-            
-            const navigateToSlide = (index) => {
-            if (index < 0 || index >= sections.length) return;
-            currentIndex = index;
-            sections[currentIndex].scrollIntoView({ behavior: 'smooth' });
-            };
-            
-            prevBtn.addEventListener('click', () => navigateToSlide(currentIndex - 1));
-            nextBtn.addEventListener('click', () => navigateToSlide(currentIndex + 1));
-            
-            /* ----------------------------------------------------------------------
-            3. OBSERVER FOR SECTION ANIMATIONS & VIDEO TRIGGERING
-            ---------------------------------------------------------------------- */
-            const observerOptions = {
-            root: container,
-            threshold: 0.5
-            };
-            
-            const sectionObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-            if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-            
-            // Find index of current active slide
-            const index = Array.from(sections).indexOf(entry.target);
-            currentIndex = index;
-            updateHUD(index);
-            
-            // Handle Growth Story Video Logic (Play once when entering, pause when leaving)
-            if (entry.target.id === 'slide-6' && growthVideo) {
-            growthVideo.currentTime = 0;
-            growthVideo.play().catch(e => console.log('Autoplay blocked:', e));
-            }
-            } else {
-            // Pause growth video when leaving slide-6
-            if (entry.target.id === 'slide-6' && growthVideo) {
-            growthVideo.pause();
-            }
-            }
-            });
-            }, observerOptions);
-            
-            sections.forEach(section => sectionObserver.observe(section));
-            
-            /* ----------------------------------------------------------------------
-            4. KEYBOARD SHORTCUTS (STAGE PRESENTER CONTROLS)
-            ---------------------------------------------------------------------- */
-            document.addEventListener('keydown', (e) => {
-            // Skip intro on Space key if active
-            if (!introOverlay.classList.contains('fade-out') && (e.code === 'Space' || e.code === 'Enter')) {
-            e.preventDefault();
-            clearTimeout(autoSkipTimer);
-            dismissIntro();
-            return;
-            }
-            
-            switch (e.code) {
-            case 'ArrowDown':
-            case 'ArrowRight':
-            case 'Space':
-            e.preventDefault();
-            navigateToSlide(currentIndex + 1);
-            break;
-            
-            case 'ArrowUp':
-            case 'ArrowLeft':
-            e.preventDefault();
-            navigateToSlide(currentIndex - 1);
-            break;
-            
-            case 'KeyF': // [F] Toggle Fullscreen Mode
-            e.preventDefault();
-            if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => console.log(err));
-            } else {
-            document.exitFullscreen().catch(err => console.log(err));
-            }
-            break;
-            
-            case 'KeyM': // [M] Toggle Audio Mute
-            e.preventDefault();
-            isMuted = !isMuted;
-            if (growthVideo) growthVideo.muted = isMuted;
-            if (introVideo) introVideo.muted = isMuted;
-            break;
-            
-            case 'KeyR': // [R] Restart Presentation
-            e.preventDefault();
-            navigateToSlide(0);
-            break;
-            }
-            });
-            });
-            </script>
-            </body>
-            </html> if (growthVideo) growthVideo.muted = isMuted;
-            if (introVideo) introVideo.muted = isMuted;
-            break;
-            
-            case 'KeyR': // [R] Restart Presentation
-            e.preventDefault();
-            navigateToSlide(0);
-            break;
-            }
-            });
-            });
+    <div style="text-align: center; width: 100%;">
+    <span class="section-tag reveal">Precision Architecture</span>
+    <h2 class="reveal delay-1" style="font-size: 2.2rem; margin-bottom: 2.5rem;">Anatomy of Innovation</h2>
+    
+    <div class="details-interactive reveal delay-2" style="margin: 0 auto;">
+    <div class="details-img-container">
+    <img src="assets/59687-removebg-preview.png" alt="BloomPen Close Up">
+    
+    <!-- Hotspot 1: Graphite Nib -->
+    <div class="hotspot hs-nib"></div>
+    <div class="hotspot-card" style="top: 10%; left: 0%;">
+    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Smooth Graphite Core</h4>
+    <p style="font-size: 0.8rem;">Non-toxic, high-density graphite engineered for precision writing without breakage.</p>
+    </div>
+    
+    <!-- Hotspot 2: Wooden Body -->
+    <div class="hotspot hs-body"></div>
+    <div class="hotspot-card" style="top: 30%; left: 30%;">
+    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Sustainably Sourced Cedar</h4>
+    <p style="font-size: 0.8rem;">Chemical-free, polished natural wood body designed for comfortable grip.</p>
+    </div>
+    
+    <!-- Hotspot 3: Seed Capsule -->
+    <div class="hotspot hs-capsule"></div>
+    <div class="hotspot-card" style="top: 55%; left: 60%;">
+    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Biodegradable Capsule</h4>
+    <p style="font-size: 0.8rem;">Activates instantly upon exposure to moisture and soil nutrients.</p>
+    </div>
+    </div>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 5 (NEW): LOGO ANIMATION EXPLANATION -->
+    <section id="slide-5">
+    <div class="video-showcase">
+    <div>
+    <span class="section-tag reveal">Brand Identity</span>
+    <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">The Genesis of VerDiA</h2>
+    <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+    A unified geometry expressing our core philosophy: combining knowledge with natural life cycles.
+    </p>
+    <p class="reveal delay-3" style="color: var(--accent-sage);">
+    "Connecting Knowledge with Nature."
+    </p>
+    </div>
+    <div class="video-frame reveal delay-2">
+    <video id="logo-meaning-video" muted playsinline preload="auto">
+    <source src="assets/721237798_1785267715441587.mp4" type="video/mp4">
+    </video>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 6: HOW IT WORKS -->
+    <section id="slide-6">
+    <div style="max-width: 1200px; width: 100%; text-align: center;">
+    <span class="section-tag reveal">User Experience</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Circular Journey</h2>
+    
+    <div class="process-flow">
+    <div class="process-step reveal delay-1">
+    <span class="step-num">01</span>
+    <h3 class="step-title">Write</h3>
+    <p>Use the BloomPen standardly for sketching, note-taking, and capturing ideas until it reaches its stub.</p>
+    </div>
+    <div class="process-step reveal delay-2">
+    <span class="step-num">02</span>
+    <h3 class="step-title">Plant</h3>
+    <p>Insert the green capsule stub directly into moist soil at a 45-degree angle in sunlight.</p>
+    </div>
+    <div class="process-step reveal delay-3">
+    <span class="step-num">03</span>
+    <h3 class="step-title">Grow</h3>
+    <p>Water regularly. The capsule dissolves within 48 hours, sprouting vibrant herbs or flora.</p>
+    </div>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 7: GROWTH STORY (Video Segment) -->
+    <section id="slide-7">
+    <div class="video-showcase">
+    <div>
+    <span class="section-tag reveal">Life Cycle Transformation</span>
+    <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">From Thought to Living Nature.</h2>
+    <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+    Watch the transition unfold. When your pencil reaches the end of its functional life, its secondary journey begins.
+    </p>
+    <p class="reveal delay-3" style="color: var(--accent-sage);">
+    "Decomposition gives way to living flora."
+    </p>
+    </div>
+    <div class="video-frame reveal delay-2">
+    <video id="growth-video" muted playsinline preload="auto">
+    <source src="assets/634969515_1785227179024768.mp4" type="video/mp4">
+    </video>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 8: PACKAGING EXPERIENCE -->
+    <section id="slide-8">
+    <div class="packaging-layout">
+    <div class="reveal">
+    <img src="assets/59829.png" alt="VerDiA Packaging Kit" style="max-height: 60vh;">
+    </div>
+    <div>
+    <span class="section-tag reveal">Unboxing Innovation</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 1.5rem;">The VerDiA Growth Kit</h2>
+    <p class="reveal delay-2" style="margin-bottom: 1.5rem;">
+    Every edition arrives in 100% biodegradable, seed-infused packaging paper. Unbox a sleek, plastic-free presentation designed to make sustainability feel luxurious.
+    </p>
+    <ul class="reveal delay-3" style="list-style: none; line-height: 2;">
+    <li>&#10003; Minimum 5 Terra Edition Pencils</li>
+    <li>&#10003; Soil Activation Guide included</li>
+    <li>&#10003; Zero synthetic adhesives or plastic foils</li>
+    </ul>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 9: WHY BLOOMPEN IS DIFFERENT (Comparison Matrix) -->
+    <section id="slide-9">
+    <div style="text-align: center; width: 100%;">
+    <span class="section-tag reveal">Market Advantage</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem;">Why BloomPen Matters</h2>
+    
+    <div class="comparison-grid reveal delay-2" style="margin: 0 auto;">
+    <div class="comp-card bad">
+    <h3><span style="color: #FF6B6B;">&#10007;</span> Traditional Pencil</h3>
+    <ul class="comp-list">
+    <li><span style="color: #FF6B6B;">&bull;</span> Extracted from virgin timber forests</li>
+    <li><span style="color: #FF6B6B;">&bull;</span> Ends as landfilled toxic stub waste</li>
+    <li><span style="color: #FF6B6B;">&bull;</span> Synthetic rubber and metal ferrules</li>
+    <li><span style="color: #FF6B6B;">&bull;</span> Linear consumable mindset</li>
+    </ul>
+    </div>
+    <div class="comp-card good">
+    <h3><span style="color: var(--accent-sage);">&#10004;</span> BloomPen Terra</h3>
+    <ul class="comp-list">
+    <li><span style="color: var(--accent-sage);">&bull;</span> Reclaimed cedar & non-toxic lead</li>
+    <li><span style="color: var(--accent-sage);">&bull;</span> Grows into organic flora after use</li>
+    <li><span style="color: var(--accent-sage);">&bull;</span> 100% compostable capsule core</li>
+    <li><span style="color: var(--accent-sage);">&bull;</span> Circular regenerative ecosystem</li>
+    </ul>
+    </div>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 10: BRAND STORY & LOGO DNA -->
+    <section id="slide-10">
+    <div style="text-align: center; max-width: 1100px; width: 100%;">
+    <span class="section-tag reveal">Identity Architecture</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Meaning Behind Our Logo</h2>
+    
+    <div class="brand-story-grid">
+    <div class="dna-item reveal delay-1">
+    <span class="dna-icon">&#9997;</span>
+    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Pencil Nib</h3>
+    <p style="font-size: 0.9rem;">Symbolizing <strong>Knowledge</strong>, creativity, human expression, and education.</p>
+    </div>
+    <div class="dna-item reveal delay-2">
+    <span class="dna-icon">&#127811;</span>
+    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Leaves</h3>
+    <p style="font-size: 0.9rem;">Symbolizing <strong>Nature</strong>, environmental responsibility, and ecological balance.</p>
+    </div>
+    <div class="dna-item reveal delay-3">
+    <span class="dna-icon">&#127793;</span>
+    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Seed</h3>
+    <p style="font-size: 0.9rem;">Symbolizing <strong>Growth</strong>, potential, future impact, and regenerative design.</p>
+    </div>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 11: FINAL VISION -->
+    <section id="slide-11">
+    <div class="final-content">
+    <img src="assets/Picsart_26-07-28_00-56-51-694.png" alt="VerDiA Logo" class="final-logo reveal">
+    <h2 class="final-quote reveal delay-1">"Every idea has the power to grow."</h2>
+    <p class="reveal delay-2" style="font-size: 1.2rem; color: var(--accent-sage-light); margin-bottom: 2rem;">
+    Thank you. Join us in shaping a regenerative future.
+    </p>
+    <span class="section-tag reveal delay-3" style="letter-spacing: 0.4em;">VerDiA &bull; Student Innovation 2026</span>
+    </div>
+    </section>
+    
+    </main>
+    
+    <!-- ==========================================================================
+    JAVASCRIPT: CONTROLS, ANIMATIONS & STAGE MECHANICS
+    ========================================================================== -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // Elements
+    const introOverlay = document.getElementById('intro-overlay');
+    const introVideo = document.getElementById('intro-video');
+    const skipBtn = document.getElementById('skip-btn');
+    const container = document.getElementById('scroll-container');
+    const sections = document.querySelectorAll('section');
+    const hudCounter = document.getElementById('hud-counter');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const logoMeaningVideo = document.getElementById('logo-meaning-video');
+    const growthVideo = document.getElementById('growth-video');
+    
+    let currentIndex = 0;
+    let isMuted = false;
+    
+    /* ----------------------------------------------------------------------
+    1. INTRO OVERLAY LOGIC (Auto-fade + Manual Skip Button)
+    ---------------------------------------------------------------------- */
+    const dismissIntro = () => {
+    if (!introOverlay.classList.contains('fade-out')) {
+    introOverlay.classList.add('fade-out');
+    setTimeout(() => introOverlay.remove(), 1200);
+    }
+    };
+    
+    // Auto dismiss after 6.5 seconds max
+    const autoSkipTimer = setTimeout(dismissIntro, 6500);
+    
+    // Dismiss on video end
+    if (introVideo) {
+    introVideo.addEventListener('ended', dismissIntro);
+    }
+    
+    // Manual dismiss on button click or background click
+    if (skipBtn) {
+    skipBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearTimeout(autoSkipTimer);
+    dismissIntro();
+    });
+    }
+    
+    introOverlay.addEventListener('click', () => {
+    clearTimeout(autoSkipTimer);
+    dismissIntro();
+    });
+    
+    /* ----------------------------------------------------------------------
+    2. NAVIGATION & HUD UPDATES
+    ---------------------------------------------------------------------- */
+    const updateHUD = (index) => {
+    const formattedCurrent = String(index + 1).padStart(2, '0');
+    const formattedTotal = String(sections.length).padStart(2, '0');
+    hudCounter.textContent = `${formattedCurrent} / ${formattedTotal}`;
+    };
+    
+    const navigateToSlide = (index) => {
+    if (index < 0 || index >= sections.length) return;
+    currentIndex = index;
+    sections[currentIndex].scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    prevBtn.addEventListener('click', () => navigateToSlide(currentIndex - 1));
+    nextBtn.addEventListener('click', () => navigateToSlide(currentIndex + 1));
+    
+    /* ----------------------------------------------------------------------
+    3. OBSERVER FOR SECTION ANIMATIONS & VIDEO TRIGGERING
+    ---------------------------------------------------------------------- */
+    const observerOptions = {
+    root: container,
+    threshold: 0.5
+    };
+    
+    const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+    if (entry.isIntersecting) {
+    entry.target.classList.add('active');
+    
+    // Find index of current active slide
+    const index = Array.from(sections).indexOf(entry.target);
+    currentIndex = index;
+    updateHUD(index);
+    
+    // Handle Slide 5 Video (Logo Meaning)
+    if (entry.target.id === 'slide-5' && logoMeaningVideo) {
+    logoMeaningVideo.currentTime = 0;
+    logoMeaningVideo.play().catch(e => console.log('Autoplay blocked:', e));
+    }
+    
+    // Handle Slide 7 Video (Growth Story)
+    if (entry.target.id === 'slide-7' && growthVideo) {
+    growthVideo.currentTime = 0;
+    growthVideo.play().catch(e => console.log('Autoplay blocked:', e));
+    }
+    } else {
+    // Pause videos when leaving respective sections
+    if (entry.target.id === 'slide-5' && logoMeaningVideo) {
+    logoMeaningVideo.pause();
+    }
+    if (entry.target.id === 'slide-7' && growthVideo) {
+    growthVideo.pause();
+    }
+    }
+    });
+    }, observerOptions);
+    
+    sections.forEach(section => sectionObserver.observe(section));
+    
+    /* ----------------------------------------------------------------------
+    4. KEYBOARD SHORTCUTS (STAGE PRESENTER CONTROLS)
+    ---------------------------------------------------------------------- */
+    document.addEventListener('keydown', (e) => {
+    // Skip intro on Space key if active
+    if (!introOverlay.classList.contains('fade-out') && (e.code === 'Space' || e.code === 'Enter')) {
+    e.preventDefault();
+    clearTimeout(autoSkipTimer);
+    dismissIntro();
+    return;
+    }
+    
+    switch (e.code) {
+    case 'ArrowDown':
+    case 'ArrowRight':
+    case 'Space':
+    e.preventDefault();
+    navigateToSlide(currentIndex + 1);
+    break;
+    
+    case 'ArrowUp':
+    case 'ArrowLeft':
+    e.preventDefault();
+    navigateToSlide(currentIndex - 1);
+    break;
+    
+    case 'KeyP': // [P] Toggle Play/Pause on current video
+    e.preventDefault();
+    const activeVideo = sections[currentIndex].querySelector('video');
+    if (activeVideo) {
+    if (activeVideo.paused) {
+    activeVideo.play().catch(err => console.log(err));
+    } else {
+    activeVideo.pause();
+    }
+    }
+    break;
+    
+    case 'KeyF': // [F] Toggle Fullscreen Mode
+    e.preventDefault();
+    if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => console.log(err));
+    } else {
+    document.exitFullscreen().catch(err => console.log(err));
+    }
+    break;
+    
+    case 'KeyM': // [M] Toggle Audio Mute across all videos
+    e.preventDefault();
+    isMuted = !isMuted;
+    if (logoMeaningVideo) logoMeaningVideo.muted = isMuted;
+    if (growthVideo) growthVideo.muted = isMuted;
+    if (introVideo) introVideo.muted = isMuted;
+    break;
+    
+    case 'KeyR': // [R] Restart Presentation
+    e.preventDefault();
+    navigateToSlide(0);
+    break;
+    }
+    });
+    });
+    </script>
+    </body>
+    </html>           });
             </script>
             </body>
             </html>
