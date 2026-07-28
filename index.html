@@ -1,126 +1,1022 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sandesh - Cyber Link</title>
-    <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Orbitron', sans-serif; }
-        #ui { position: absolute; top: 20px; left: 20px; color: #00f2ff; pointer-events: none; }
-        .btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-               padding: 15px 40px; background: #00f2ff; border: none; color: #000; 
-               font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 0 20px #00f2ff; }
-        video { position: absolute; bottom: 10px; right: 10px; width: 120px; border: 1px solid #00f2ff; transform: scaleX(-1); }
-        /* Creating a glowing text effect for the overlay name */
-        #name-overlay {
-            position: absolute; width: 100%; text-align: center; top: 40%;
-            font-size: 80px; font-weight: bold; color: #00f2ff;
-            text-shadow: 0 0 20px #00f2ff, 0 0 40px #00f2ff;
-            pointer-events: none; letter-spacing: 15px; opacity: 0.8;
-            display: none;
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VerDiA — BloomPen Terra Edition</title>
+  
+  <!-- Typography: Inter & Playfair Display for Apple-esque Luxury Feel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & SYSTEM RESET
+       ========================================================================== */
+    :root {
+      --bg-forest: #0D1C15;
+      --bg-forest-light: #162E23;
+      --accent-sage: #8FA89B;
+      --accent-sage-light: #C2D4CB;
+      --text-beige: #EAE3D2;
+      --text-white: #FFFFFF;
+      --text-muted: #A3B0A8;
+      --gold-accent: #D4AF37;
+      
+      --font-heading: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-forest);
+      color: var(--text-beige);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* Snap-scroll container for presenter mode */
+    .presentation-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    section {
+      height: 100vh;
+      width: 100vw;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 8vw;
+      overflow: hidden;
+    }
+
+    /* Standardized typography */
+    h1, h2, h3 {
+      font-family: var(--font-heading);
+      color: var(--text-white);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+
+    .section-tag {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--accent-sage);
+      margin-bottom: 1.2rem;
+      display: block;
+      font-weight: 600;
+    }
+
+    p {
+      color: var(--text-beige);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    img, video {
+      max-width: 100%;
+      height: auto;
+      user-select: none;
+    }
+
+    /* GPU-accelerated blur-up animation utilities */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      filter: blur(10px);
+      transition: opacity 1s var(--ease-out-expo),
+                  transform 1s var(--ease-out-expo),
+                  filter 1s var(--ease-out-expo);
+    }
+
+    section.active .reveal {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+
+    .delay-1 { transition-delay: 0.15s; }
+    .delay-2 { transition-delay: 0.3s; }
+    .delay-3 { transition-delay: 0.45s; }
+    .delay-4 { transition-delay: 0.6s; }
+
+    /* ==========================================================================
+       2. INTRO OVERLAY (SPLASH SCREEN)
+       ========================================================================== */
+    #intro-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.2s var(--ease-out-expo), visibility 1.2s;
+    }
+
+    #intro-overlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #intro-overlay video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .skip-prompt {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.1);
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       3. NAVIGATION & PRESENTER HUD
+       ========================================================================== */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .top-nav .brand-logo {
+      height: 32px;
+      pointer-events: auto;
+    }
+
+    .presenter-hud {
+      position: fixed;
+      bottom: 2rem;
+      right: 3rem;
+      background: rgba(22, 46, 35, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(143, 168, 155, 0.2);
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .hud-counter {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--accent-sage);
+    }
+
+    .hud-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .hud-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-white);
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    .hud-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .key-hints {
+      position: fixed;
+      bottom: 2rem;
+      left: 3rem;
+      font-size: 0.75rem;
+      color: rgba(234, 227, 210, 0.4);
+      z-index: 100;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       4. SECTION SPECIFIC STYLES
+       ========================================================================== */
+    
+    /* Hero Section */
+    .hero-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      width: 100%;
+      max-width: 1300px;
+      gap: 4rem;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-tagline {
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      color: var(--accent-sage-light);
+      font-style: italic;
+      font-family: var(--font-heading);
+      margin-bottom: 2rem;
+    }
+
+    .hero-img-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .hero-img-wrap img {
+      max-height: 70vh;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+    }
+
+    /* Problem Section */
+    .problem-content {
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .stat-callout {
+      font-size: clamp(4rem, 8vw, 9rem);
+      font-family: var(--font-heading);
+      color: var(--accent-sage);
+      line-height: 1;
+      margin: 1.5rem 0;
+      font-weight: 600;
+    }
+
+    /* Product Reveal Section */
+    .reveal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    .floating-product {
+      animation: float 6s ease-in-out infinite;
+      text-align: center;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(1deg); }
+    }
+
+    .feature-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(143, 168, 155, 0.15);
+      padding: 1.8rem;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: var(--transition-smooth);
+    }
+
+    .card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--accent-sage);
+      transform: translateY(-4px);
+    }
+
+    .card h4 {
+      color: var(--text-white);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    /* Interactive Details Section */
+    .details-interactive {
+      position: relative;
+      max-width: 1100px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .details-img-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    .hotspot {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-sage);
+      border: 2px solid var(--text-white);
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(143, 168, 155, 0.8);
+      transition: transform 0.3s;
+    }
+
+    .hotspot::after {
+      content: '';
+      position: absolute;
+      top: -6px; left: -6px; right: -6px; bottom: -6px;
+      border-radius: 50%;
+      border: 1px solid var(--accent-sage);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    .hotspot:hover {
+      transform: scale(1.2);
+    }
+
+    /* Hotspot positions on close-up image */
+    .hs-nib { top: 25%; left: 18%; }
+    .hs-body { top: 45%; left: 45%; }
+    .hs-capsule { top: 72%; left: 78%; }
+
+    .hotspot-card {
+      position: absolute;
+      width: 260px;
+      background: rgba(13, 28, 21, 0.95);
+      border: 1px solid var(--accent-sage);
+      padding: 1.2rem;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+
+    .hotspot:hover + .hotspot-card,
+    .hotspot-card:hover {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* How It Works Section */
+    .process-flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 1200px;
+      width: 100%;
+      margin-top: 3rem;
+    }
+
+    .process-step {
+      background: rgba(22, 46, 35, 0.4);
+      border: 1px solid rgba(143, 168, 155, 0.1);
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-num {
+      font-family: var(--font-heading);
+      font-size: 3.5rem;
+      color: rgba(143, 168, 155, 0.2);
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+    }
+
+    .step-title {
+      font-size: 1.5rem;
+      color: var(--text-white);
+      margin-bottom: 1rem;
+    }
+
+    /* Growth Story Section */
+    .video-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    .video-frame {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(143, 168, 155, 0.3);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      background: #000;
+      aspect-ratio: 16/9;
+    }
+
+    .video-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Packaging Section */
+    .packaging-layout {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      align-items: center;
+      gap: 4rem;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    /* Comparison Matrix Section */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      max-width: 1000px;
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    .comp-card {
+      padding: 3rem 2.5rem;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .comp-card.bad {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 100, 100, 0.15);
+    }
+
+    .comp-card.good {
+      background: rgba(22, 46, 35, 0.8);
+      border: 1px solid var(--accent-sage);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .comp-card h3 {
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .comp-list {
+      list-style: none;
+    }
+
+    .comp-list li {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1rem;
+    }
+
+    /* Brand Story Section */
+    .brand-story-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 1100px;
+      width: 100%;
+      margin-top: 3rem;
+    }
+
+    .dna-item {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      border: 1px solid rgba(143, 168, 155, 0.1);
+    }
+
+    .dna-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    /* Final Vision Section */
+    .final-content {
+      text-align: center;
+      max-width: 850px;
+    }
+
+    .final-logo {
+      height: 60px;
+      margin-bottom: 2.5rem;
+    }
+
+    .final-quote {
+      font-size: clamp(2.2rem, 4vw, 3.8rem);
+      font-family: var(--font-heading);
+      line-height: 1.2;
+      color: var(--text-white);
+      margin-bottom: 2rem;
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 900px) {
+      .hero-layout, .reveal-grid, .video-showcase, .packaging-layout, .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .process-flow, .brand-story-grid {
+        grid-template-columns: 1fr;
+      }
+      section {
+        padding: 6rem 5vw 4rem;
+        height: auto;
+        min-height: 100vh;
+      }
+      .presentation-container {
+        scroll-snap-type: none;
+      }
+      .feature-cards {
+        grid-template-columns: 1fr;
+      }
+      .key-hints {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<div id="ui">
-    <h2>USER_ID: SANDESH</h2>
-    <p id="status">STATUS: OFFLINE</p>
-</div>
+  <!-- ==========================================================================
+       INTRO OVERLAY (Auto-fade timer + Manual Skip)
+       ========================================================================== -->
+  <div id="intro-overlay">
+    <video id="intro-video" autoplay muted playsinline>
+      <source src="https://files.catbox.moe/pzjnpp.mp4" type="video/mp4">
+    </video>
+    <div class="skip-prompt">Press SPACE or Click to Skip</div>
+  </div>
 
-<div id="name-overlay">SANDESH</div>
+  <!-- FIXED NAVIGATION & PRESENTER HUD -->
+  <nav class="top-nav">
+    <img src="https://files.catbox.moe/e9tm0k.png" alt="VerDiA Logo" class="brand-logo">
+  </nav>
 
-<button class="btn" id="start-btn" onclick="initializeSystem()">INITIALIZE SANDESH_LINK</button>
-<video id="webcam" playsinline></video>
+  <div class="presenter-hud">
+    <span class="hud-counter" id="hud-counter">01 / 10</span>
+    <div class="hud-controls">
+      <button class="hud-btn" id="prev-btn" title="Previous (Up Arrow)">&#8593;</button>
+      <button class="hud-btn" id="next-btn" title="Next (Down Arrow)">&#8595;</button>
+    </div>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <div class="key-hints">
+    [&uarr;/&darr;] Navigate &nbsp;|&nbsp; [F] Fullscreen &nbsp;|&nbsp; [M] Mute &nbsp;|&nbsp; [R] Reset
+  </div>
 
-<script>
-let scene, camera, renderer, crystalGroup, nameMesh;
+  <!-- ==========================================================================
+       PRESENTATION SLIDES CONTAINER
+       ========================================================================== -->
+  <main class="presentation-container" id="scroll-container">
 
-function setup3D() {
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
+    <!-- SLIDE 1: HERO SECTION -->
+    <section id="slide-1" class="active">
+      <div class="hero-layout">
+        <div class="hero-text">
+          <span class="section-tag reveal">Introducing</span>
+          <h1 class="hero-title reveal delay-1">BloomPen<br><i style="font-weight: 300;">Terra Edition</i></h1>
+          <p class="hero-tagline reveal delay-2">"Write Today. Grow Tomorrow."</p>
+          <p class="reveal delay-3" style="max-width: 480px;">
+            The premium plantable pencil designed to bridge human thought and nature's lifecycle. Crafted for the eco-conscious mind.
+          </p>
+        </div>
+        <div class="hero-img-wrap reveal delay-2">
+          <img src="https://files.catbox.moe/cvc0u5.png" alt="VerDiA BloomPen Terra Edition Hero">
+        </div>
+      </div>
+    </section>
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    <!-- SLIDE 2: THE PROBLEM -->
+    <section id="slide-2">
+      <div class="problem-content">
+        <span class="section-tag reveal">The Ecological Friction</span>
+        <h2 class="reveal delay-1" style="font-size: clamp(2rem, 3.5vw, 3rem);">Billions of written instruments end up in landfills every year.</h2>
+        <div class="stat-callout reveal delay-2">15 Billion+</div>
+        <p class="reveal delay-3" style="font-size: 1.2rem; max-width: 650px; margin: 0 auto;">
+          Traditional wooden and plastic pencils are treated as disposable linear waste. Knowledge shouldn't leave a footprint of destruction behind.
+        </p>
+      </div>
+    </section>
 
-    crystalGroup = new THREE.Group();
-    scene.add(crystalGroup);
+    <!-- SLIDE 3: PRODUCT REVEAL -->
+    <section id="slide-3">
+      <div class="reveal-grid">
+        <div class="floating-product reveal">
+          <img src="https://files.catbox.moe/i46rzl.png" alt="BloomPen Product Render" style="max-height: 65vh;">
+        </div>
+        <div>
+          <span class="section-tag reveal">Sustainable Engineering</span>
+          <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 2rem;">Designed to give back to the Earth.</h2>
+          <div class="feature-cards">
+            <div class="card reveal delay-2">
+              <h4>Recycled Wood</h4>
+              <p>Sourced purely from post-industrial cedar fragments without harming standing forests.</p>
+            </div>
+            <div class="card reveal delay-2">
+              <h4>Seed Capsule</h4>
+              <p>Biodegradable cellulose tip protecting non-GMO organic botanical seeds.</p>
+            </div>
+            <div class="card reveal delay-3">
+              <h4>Sustainable Design</h4>
+              <p>Ergonomic graphite core optimized for extended writing lifespan and smooth draw.</p>
+            </div>
+            <div class="card reveal delay-3">
+              <h4>Educational Impact</h4>
+              <p>Empowering classroom innovation by turning completion into cultivation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    // Create a "Crystalline Shield" around the name
-    for(let i=0; i<12; i++) {
-        const geometry = new THREE.IcosahedronGeometry(2, 0);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0x00f2ff, 
-            wireframe: true, 
-            transparent: true, 
-            opacity: 0.1 + (i * 0.05) 
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
-        crystalGroup.add(mesh);
-    }
-
-    animate();
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-    crystalGroup.rotation.y += 0.005;
-    crystalGroup.rotation.z += 0.002;
-    renderer.render(scene, camera);
-}
-
-async function initializeSystem() {
-    document.getElementById('start-btn').style.display = 'none';
-    document.getElementById('name-overlay').style.display = 'block';
-    document.getElementById('status').innerText = "STATUS: SYNCING...";
-    
-    setup3D();
-
-    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-    hands.setOptions({ maxNumHands: 1, modelComplexity: 0 });
-
-    hands.onResults((res) => {
-        if (res.multiHandLandmarks && res.multiHandLandmarks[0]) {
-            const lm = res.multiHandLandmarks[0];
-            document.getElementById('status').innerText = "STATUS: LINK_ACTIVE";
+    <!-- SLIDE 4: PRODUCT DETAILS (Interactive Hotspots) -->
+    <section id="slide-4">
+      <div style="text-align: center; width: 100%;">
+        <span class="section-tag reveal">Precision Architecture</span>
+        <h2 class="reveal delay-1" style="font-size: 2.2rem; margin-bottom: 2.5rem;">Anatomy of Innovation</h2>
+        
+        <div class="details-interactive reveal delay-2" style="margin: 0 auto;">
+          <div class="details-img-container">
+            <img src="https://files.catbox.moe/9slmlb.png" alt="BloomPen Close Up">
             
-            // 1. Hand Position moves the 3D Name Crystal
-            const tx = (0.5 - lm[9].x) * 8;
-            const ty = (0.5 - lm[9].y) * 6;
-            crystalGroup.position.x += (tx - crystalGroup.position.x) * 0.1;
-            crystalGroup.position.y += (ty - crystalGroup.position.y) * 0.1;
+            <!-- Hotspot 1: Graphite Nib -->
+            <div class="hotspot hs-nib"></div>
+            <div class="hotspot-card" style="top: 10%; left: 0%;">
+              <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Smooth Graphite Core</h4>
+              <p style="font-size: 0.8rem;">Non-toxic, high-density graphite engineered for precision writing without breakage.</p>
+            </div>
 
-            // 2. Map Name Overlay to follow 3D center
-            const nameEl = document.getElementById('name-overlay');
-            nameEl.style.transform = `translate(${tx * 20}px, ${-ty * 20}px)`;
+            <!-- Hotspot 2: Wooden Body -->
+            <div class="hotspot hs-body"></div>
+            <div class="hotspot-card" style="top: 30%; left: 30%;">
+              <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Sustainably Sourced Cedar</h4>
+              <p style="font-size: 0.8rem;">Chemical-free, polished natural wood body designed for comfortable grip.</p>
+            </div>
 
-            // 3. Pinch Gesture = Glow Pulse
-            const pinchDist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
-            if(pinchDist < 0.05) {
-                nameEl.style.color = "#ffffff";
-                nameEl.style.textShadow = "0 0 50px #fff, 0 0 100px #00f2ff";
-                crystalGroup.scale.set(1.2, 1.2, 1.2);
-            } else {
-                nameEl.style.color = "#00f2ff";
-                nameEl.style.textShadow = "0 0 20px #00f2ff";
-                crystalGroup.scale.set(1, 1, 1);
+            <!-- Hotspot 3: Seed Capsule -->
+            <div class="hotspot hs-capsule"></div>
+            <div class="hotspot-card" style="top: 55%; left: 60%;">
+            <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Biodegradable Capsule</h4>
+            <p style="font-size: 0.8rem;">Activates instantly upon exposure to moisture and soil nutrients.</p>
+            </div>
+            </div>
+            </div>
+            </div>
+            </section>
+            
+            <!-- SLIDE 5: HOW IT WORKS -->
+            <section id="slide-5">
+            <div style="max-width: 1200px; width: 100%; text-align: center;">
+            <span class="section-tag reveal">User Experience</span>
+            <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Circular Journey</h2>
+            
+            <div class="process-flow">
+            <div class="process-step reveal delay-1">
+            <span class="step-num">01</span>
+            <h3 class="step-title">Write</h3>
+            <p>Use the BloomPen standardly for sketching, note-taking, and capturing ideas until it reaches its stub.</p>
+            </div>
+            <div class="process-step reveal delay-2">
+            <span class="step-num">02</span>
+            <h3 class="step-title">Plant</h3>
+            <p>Insert the green capsule stub directly into moist soil at a 45-degree angle in sunlight.</p>
+            </div>
+            <div class="process-step reveal delay-3">
+            <span class="step-num">03</span>
+            <h3 class="step-title">Grow</h3>
+            <p>Water regularly. The capsule dissolves within 48 hours, sprouting vibrant herbs or flora.</p>
+            </div>
+            </div>
+            </div>
+            </section>
+            
+            <!-- SLIDE 6: GROWTH STORY (Video Segment) -->
+            <section id="slide-6">
+            <div class="video-showcase">
+            <div>
+            <span class="section-tag reveal">Life Cycle Transformation</span>
+            <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">From Thought to Living Nature.</h2>
+            <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+            Watch the transition unfold. When your pencil reaches the end of its functional life, its secondary journey begins.
+            </p>
+            <p class="reveal delay-3" style="color: var(--accent-sage);">
+            "Decomposition gives way to living flora."
+            </p>
+            </div>
+            <div class="video-frame reveal delay-2">
+            <video id="growth-video" muted playsinline preload="auto">
+            <source src="https://files.catbox.moe/s6p8ve.mp4" type="video/mp4">
+            </video>
+            </div>
+            </div>
+            </section>
+            
+            <!-- SLIDE 7: PACKAGING EXPERIENCE -->
+            <section id="slide-7">
+            <div class="packaging-layout">
+            <div class="reveal">
+            <img src="https://files.catbox.moe/5p6qt8.png" alt="VerDiA Packaging Kit" style="max-height: 60vh;">
+            </div>
+            <div>
+            <span class="section-tag reveal">Unboxing Innovation</span>
+            <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 1.5rem;">The VerDiA Growth Kit</h2>
+            <p class="reveal delay-2" style="margin-bottom: 1.5rem;">
+            Every edition arrives in 100% biodegradable, seed-infused packaging paper. Unbox a sleek, plastic-free presentation designed to make sustainability feel luxurious.
+            </p>
+            <ul class="reveal delay-3" style="list-style: none; line-height: 2;">
+            <li>&#10003; Minimum 5 Terra Edition Pencils</li>
+            <li>&#10003; Soil Activation Guide included</li>
+            <li>&#10003; Zero synthetic adhesives or plastic foils</li>
+            </ul>
+            </div>
+            </div>
+            </section>
+            
+            <!-- SLIDE 8: WHY BLOOMPEN IS DIFFERENT (Comparison Matrix) -->
+            <section id="slide-8">
+            <div style="text-align: center; width: 100%;">
+            <span class="section-tag reveal">Market Advantage</span>
+            <h2 class="reveal delay-1" style="font-size: 2.5rem;">Why BloomPen Matters</h2>
+            
+            <div class="comparison-grid reveal delay-2" style="margin: 0 auto;">
+            <div class="comp-card bad">
+            <h3><span style="color: #FF6B6B;">&#10007;</span> Traditional Pencil</h3>
+            <ul class="comp-list">
+            <li><span style="color: #FF6B6B;">&bull;</span> Extracted from virgin timber forests</li>
+            <li><span style="color: #FF6B6B;">&bull;</span> Ends as landfilled toxic stub waste</li>
+            <li><span style="color: #FF6B6B;">&bull;</span> Synthetic rubber and metal ferrules</li>
+            <li><span style="color: #FF6B6B;">&bull;</span> Linear consumable mindset</li>
+            </ul>
+            </div>
+            <div class="comp-card good">
+            <h3><span style="color: var(--accent-sage);">&#10004;</span> BloomPen Terra</h3>
+            <ul class="comp-list">
+            <li><span style="color: var(--accent-sage);">&bull;</span> Reclaimed cedar & non-toxic lead</li>
+            <li><span style="color: var(--accent-sage);">&bull;</span> Grows into organic flora after use</li>
+            <li><span style="color: var(--accent-sage);">&bull;</span> 100% compostable capsule core</li>
+            <li><span style="color: var(--accent-sage);">&bull;</span> Circular regenerative ecosystem</li>
+            </ul>
+            </div>
+            </div>
+            </div>
+            </section>
+            
+            <!-- SLIDE 9: BRAND STORY & LOGO DNA -->
+            <section id="slide-9">
+            <div style="text-align: center; max-width: 1100px; width: 100%;">
+            <span class="section-tag reveal">Identity Architecture</span>
+            <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Meaning Behind Our Logo</h2>
+            
+            <div class="brand-story-grid">
+            <div class="dna-item reveal delay-1">
+            <span class="dna-icon">&#9997;</span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Pencil Nib</h3>
+            <p style="font-size: 0.9rem;">Symbolizing <strong>Knowledge</strong>, creativity, human expression, and education.</p>
+            </div>
+            <div class="dna-item reveal delay-2">
+            <span class="dna-icon">&#127811;</span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Leaves</h3>
+            <p style="font-size: 0.9rem;">Symbolizing <strong>Nature</strong>, environmental responsibility, and ecological balance.</p>
+            </div>
+            <div class="dna-item reveal delay-3">
+            <span class="dna-icon">&#127793;</span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Seed</h3>
+            <p style="font-size: 0.9rem;">Symbolizing <strong>Growth</strong>, potential, future impact, and regenerative design.</p>
+            </div>
+            </div>
+            </div>
+            </section>
+            
+            <!-- SLIDE 10: FINAL VISION -->
+            <section id="slide-10">
+            <div class="final-content">
+            <img src="https://files.catbox.moe/e9tm0k.png" alt="VerDiA" class="final-logo reveal">
+            <h2 class="final-quote reveal delay-1">"Every idea has the power to grow."</h2>
+            <p class="reveal delay-2" style="font-size: 1.2rem; color: var(--accent-sage-light); margin-bottom: 2rem;">
+            Thank you. Join us in shaping a regenerative future.
+            </p>
+            <span class="section-tag reveal delay-3" style="letter-spacing: 0.4em;">VerDiA &bull; Student Innovation 2026</span>
+            </div>
+            </section>
+            
+            </main>
+            
+            <!-- ==========================================================================
+            JAVASCRIPT: CONTROLS, ANIMATIONS & STAGE MECHANICS
+            ========================================================================== -->
+            <script>
+            document.addEventListener('DOMContentLoaded', () => {
+            // Elements
+            const introOverlay = document.getElementById('intro-overlay');
+            const introVideo = document.getElementById('intro-video');
+            const container = document.getElementById('scroll-container');
+            const sections = document.querySelectorAll('section');
+            const hudCounter = document.getElementById('hud-counter');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const growthVideo = document.getElementById('growth-video');
+            
+            let currentIndex = 0;
+            let isMuted = false;
+            
+            /* ----------------------------------------------------------------------
+            1. INTRO OVERLAY LOGIC (Auto-fade + Manual Skip)
+            ---------------------------------------------------------------------- */
+            const dismissIntro = () => {
+            if (!introOverlay.classList.contains('fade-out')) {
+            introOverlay.classList.add('fade-out');
+            setTimeout(() => introOverlay.remove(), 1200);
             }
-        }
-    });
-
-    const videoElement = document.getElementById('webcam');
-    const cameraHelper = new Camera(videoElement, {
-        onFrame: async () => { await hands.send({image: videoElement}); },
-        width: 480, height: 360
-    });
-    cameraHelper.start();
-}
-</script>
-</body>
-</html>
+            };
+            
+            // Auto dismiss after 6.5 seconds max
+            const autoSkipTimer = setTimeout(dismissIntro, 6500);
+            
+            // Dismiss on video end
+            if (introVideo) {
+            introVideo.addEventListener('ended', dismissIntro);
+            }
+            
+            // Manual dismiss on click or space
+            introOverlay.addEventListener('click', () => {
+            clearTimeout(autoSkipTimer);
+            dismissIntro();
+            });
+            
+            /* ----------------------------------------------------------------------
+            2. NAVIGATION & HUD UPDATES
+            ---------------------------------------------------------------------- */
+            const updateHUD = (index) => {
+            const formattedCurrent = String(index + 1).padStart(2, '0');
+            const formattedTotal = String(sections.length).padStart(2, '0');
+            hudCounter.textContent = `${formattedCurrent} / ${formattedTotal}`;
+            };
+            
+            const navigateToSlide = (index) => {
+            if (index < 0 || index >= sections.length) return;
+            currentIndex = index;
+            sections[currentIndex].scrollIntoView({ behavior: 'smooth' });
+            };
+            
+            prevBtn.addEventListener('click', () => navigateToSlide(currentIndex - 1));
+            nextBtn.addEventListener('click', () => navigateToSlide(currentIndex + 1));
+            
+            /* ----------------------------------------------------------------------
+            3. OBSERVER FOR SECTION ANIMATIONS & VIDEO TRIGGERING
+            ---------------------------------------------------------------------- */
+            const observerOptions = {
+            root: container,
+            threshold: 0.5
+            };
+            
+            const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+            if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            
+            // Find index of current active slide
+            const index = Array.from(sections).indexOf(entry.target);
+            currentIndex = index;
+            updateHUD(index);
+            
+            // Handle Growth Story Video Logic (Play once when entering, pause when leaving)
+            if (entry.target.id === 'slide-6' && growthVideo) {
+            growthVideo.currentTime = 0;
+            growthVideo.play().catch(e => console.log('Autoplay blocked:', e));
+            }
+            } else {
+            // Pause growth video when leaving slide-6
+            if (entry.target.id === 'slide-6' && growthVideo) {
+            growthVideo.pause();
+            }
+            }
+            });
+            }, observerOptions);
+            
+            sections.forEach(section => sectionObserver.observe(section));
+            
+            /* ----------------------------------------------------------------------
+            4. KEYBOARD SHORTCUTS (STAGE PRESENTER CONTROLS)
+            ---------------------------------------------------------------------- */
+            document.addEventListener('keydown', (e) => {
+            // Skip intro on Space key if active
+            if (!introOverlay.classList.contains('fade-out') && (e.code === 'Space' || e.code === 'Enter')) {
+            e.preventDefault();
+            clearTimeout(autoSkipTimer);
+            dismissIntro();
+            return;
+            }
+            
+            switch (e.code) {
+            case 'ArrowDown':
+            case 'ArrowRight':
+            case 'Space':
+            e.preventDefault();
+            navigateToSlide(currentIndex + 1);
+            break;
+            
+            case 'ArrowUp':
+            case 'ArrowLeft':
+            e.preventDefault();
+            navigateToSlide(currentIndex - 1);
+            break;
+            
+            case 'KeyF': // [F] Toggle Fullscreen Mode
+            e.preventDefault();
+            if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+            document.exitFullscreen().catch(err => console.log(err));
+            }
+            break;
+            
+            case 'KeyM': // [M] Toggle Audio Mute
+            e.preventDefault();
+            isMuted = !isMuted;
+            if (growthVideo) growthVideo.muted = isMuted;
+            if (introVideo) introVideo.muted = isMuted;
+            break;
+            
+            case 'KeyR': // [R] Restart Presentation
+            e.preventDefault();
+            navigateToSlide(0);
+            break;
+            }
+            });
+            });
+            </script>
+            </body>
+            </html>
