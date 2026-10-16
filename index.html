@@ -3,1073 +3,1109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Learning Inn | Next-Gen English & Multimedia Academy</title>
-  <meta name="description" content="Experience cutting-edge English, graphic design, and digital marketing training at Learning Inn with hands-on labs and immersive learning.">
+  <title>VerDiA — BloomPen Terra Edition</title>
   
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://files.catbox.moe/8d0iv8.png">
-
-  <!-- Web Fonts -->
+  <!-- Typography: Inter & Playfair Display for Apple-esque Luxury Feel -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       1. EXTENDED DESIGN SYSTEM & FUTURISTIC THEME
+       1. CSS VARIABLES & SYSTEM RESET
        ========================================================================== */
     :root {
-      --color-orange: #FF6B00;
-      --color-orange-glow: rgba(255, 107, 0, 0.4);
-      --color-cyan: #00F0FF;
-      --color-cyan-glow: rgba(0, 240, 255, 0.3);
-      --color-bg-dark: #030712;
-      --color-bg-card: rgba(15, 23, 42, 0.65);
-      --color-bg-card-hover: rgba(30, 41, 59, 0.85);
-      --color-text-main: #F8FAFC;
-      --color-text-muted: #94A3B8;
-      --color-border: rgba(255, 255, 255, 0.08);
-      --color-border-glow: rgba(255, 107, 0, 0.5);
-
-      --font-heading: 'Plus Jakarta Sans', sans-serif;
-      --font-tech: 'Space Grotesk', sans-serif;
-
-      --container-max: 1380px;
-      --radius-sm: 8px;
-      --radius-md: 16px;
-      --radius-lg: 28px;
-
-      --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      --transition-smooth: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      --bg-forest: #0D1C15;
+      --bg-forest-light: #162E23;
+      --accent-sage: #8FA89B;
+      --accent-sage-light: #C2D4CB;
+      --text-beige: #EAE3D2;
+      --text-white: #FFFFFF;
+      --text-muted: #A3B0A8;
+      --gold-accent: #D4AF37;
+      
+      --font-heading: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    *, *::before, *::after {
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      font-size: 16px;
-      background-color: var(--color-bg-dark);
-      color: var(--color-text-main);
-      font-family: var(--font-heading);
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
     }
 
-    body {
-      width: 100%;
-      overflow-x: hidden;
-      line-height: 1.6;
-      background-image: 
-        radial-gradient(circle at 15% 20%, rgba(255, 107, 0, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 60%, rgba(0, 240, 255, 0.05) 0%, transparent 40%);
-      background-attachment: fixed;
-    }
-
-    /* Ambient Animated Grid Overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
+    html, body {
       width: 100%;
       height: 100%;
-      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 50px 50px;
-      pointer-events: none;
-      z-index: 0;
+      background-color: var(--bg-forest);
+      color: var(--text-beige);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
     }
 
-    a { color: inherit; text-decoration: none; }
-    img, video { max-width: 100%; display: block; }
-    button, input, select, textarea { font-family: inherit; font-size: inherit; background: none; border: none; outline: none; }
-    button { cursor: pointer; }
+    /* Snap-scroll container for presenter mode */
+    .presentation-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
 
-    /* Utility Scaffolding */
-    .container {
-      width: 90%;
-      max-width: var(--container-max);
-      margin: 0 auto;
+    section {
+      height: 100vh;
+      width: 100vw;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
       position: relative;
-      z-index: 2;
-    }
-
-    .badge-glow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      border-radius: 50px;
-      background: rgba(255, 107, 0, 0.1);
-      border: 1px solid var(--color-orange-glow);
-      color: var(--color-orange);
-      font-family: var(--font-tech);
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 20px var(--color-orange-glow);
-    }
-
-    .badge-glow::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: var(--color-orange);
-      box-shadow: 0 0 10px var(--color-orange);
-      animation: pulseDot 1.5s infinite;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.5; }
-    }
-
-    .gradient-text {
-      background: linear-gradient(135deg, #FFFFFF 0%, #94A3B8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .gradient-orange {
-      background: linear-gradient(135deg, #FF6B00 0%, #FFA800 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .section-title {
-      font-size: clamp(2.5rem, 5vw, 4.2rem);
-      font-weight: 800;
-      line-height: 1.08;
-      letter-spacing: -0.02em;
-      margin-bottom: 24px;
-    }
-
-    /* Glassmorphism Base Card */
-    .glass-card {
-      background: var(--color-bg-card);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      transition: var(--transition-smooth);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .glass-card:hover {
-      border-color: rgba(255, 107, 0, 0.4);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px var(--color-orange-glow);
-    }
-
-    /* ==========================================================================
-       2. GLOWING NAVIGATION
-       ========================================================================== */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-      padding: 24px 0;
-      transition: var(--transition-smooth);
-    }
-
-    .navbar.scrolled {
-      padding: 14px 0;
-      background: rgba(3, 7, 18, 0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .nav-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo img {
-      height: 48px;
-      filter: drop-shadow(0 0 8px var(--color-orange-glow));
-    }
-
-    .brand-title {
-      font-family: var(--font-tech);
-      font-size: 1.3rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      color: #FFF;
-      line-height: 1;
-    }
-
-    .brand-subtitle {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--color-orange);
-      display: block;
-      margin-top: 4px;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      list-style: none;
-    }
-
-    .nav-link {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--color-text-muted);
-      position: relative;
-      padding: 6px 0;
-    }
-
-    .nav-link:hover, .nav-link.active {
-      color: var(--color-text-main);
-    }
-
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--color-orange);
-      box-shadow: 0 0 10px var(--color-orange);
-      transition: var(--transition-fast);
-    }
-
-    .nav-link:hover::after, .nav-link.active::after {
-      width: 100%;
-    }
-
-    .btn-glow {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 14px 32px;
-      border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, #FF6B00 0%, #D95D12 100%);
-      color: #FFF;
-      font-family: var(--font-tech);
-      font-weight: 700;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 0 25px var(--color-orange-glow);
-      overflow: hidden;
-      transition: var(--transition-fast);
-    }
-
-    .btn-glow::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-      transform: rotate(45deg) translateY(-100%);
-      transition: transform 0.6s ease;
-    }
-
-    .btn-glow:hover::before {
-      transform: rotate(45deg) translateY(100%);
-    }
-
-    .btn-glow:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 40px rgba(255, 107, 0, 0.7);
-    }
-
-    /* ==========================================================================
-       3. INTERACTIVE HERO & CANVAS SYSTEM
-       ========================================================================== */
-    .hero {
-      position: relative;
-      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 140px 0 80px;
+      padding: 4rem 8vw;
       overflow: hidden;
     }
 
-    .hero-video-wrapper {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    .hero-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.35;
-      filter: contrast(1.2) brightness(0.8);
-    }
-
-    #particleCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .hero-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at center, rgba(3, 7, 18, 0.4) 0%, rgba(3, 7, 18, 0.95) 100%);
-      z-index: 2;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 3;
-      text-align: center;
-      max-width: 950px;
-    }
-
-    .hero-title {
-      font-size: clamp(3.2rem, 8vw, 6.2rem);
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.03em;
-      margin-bottom: 24px;
-      text-transform: uppercase;
-    }
-
-    .hero-subtitle {
-      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-      color: var(--color-text-muted);
-      max-width: 700px;
-      margin: 0 auto 40px;
+    /* Standardized typography */
+    h1, h2, h3 {
+      font-family: var(--font-heading);
+      color: var(--text-white);
       font-weight: 400;
+      letter-spacing: -0.02em;
     }
 
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    /* Floating Stats Bar */
-    .hero-stats-bar {
-      margin-top: 80px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      background: rgba(15, 23, 42, 0.5);
-      border: 1px solid var(--color-border);
-      backdrop-filter: blur(20px);
-      padding: 30px;
-      border-radius: var(--radius-lg);
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-number {
-      font-family: var(--font-tech);
-      font-size: clamp(2rem, 4vw, 3.2rem);
-      font-weight: 800;
-      color: #FFF;
-      display: block;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .stat-label {
+    .section-tag {
       font-size: 0.85rem;
-      color: var(--color-text-muted);
       text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* ==========================================================================
-       4. INTERACTIVE COURSE EXPLORER (TABBER)
-       ========================================================================== */
-    .explorer-section {
-      padding: 120px 0;
-      position: relative;
-    }
-
-    .tab-nav {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 50px;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      padding: 14px 28px;
-      border-radius: 50px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--color-border);
-      color: var(--color-text-muted);
-      font-family: var(--font-tech);
-      font-weight: 700;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: var(--transition-fast);
-    }
-
-    .tab-btn:hover, .tab-btn.active {
-      background: var(--color-orange);
-      color: #FFF;
-      border-color: var(--color-orange);
-      box-shadow: 0 0 25px var(--color-orange-glow);
-    }
-
-    .tab-pane {
-      display: none;
-      animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .tab-pane.active {
+      letter-spacing: 0.25em;
+      color: var(--accent-sage);
+      margin-bottom: 1.2rem;
       display: block;
+      font-weight: 600;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    p {
+      color: var(--text-beige);
+      font-weight: 300;
+      line-height: 1.7;
     }
 
-    .course-details-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 50px;
-      align-items: center;
+    img, video {
+      max-width: 100%;
+      height: auto;
+      user-select: none;
     }
 
-    /* Interactive Curriculum Accordions */
-    .accordion-item {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 12px;
-      overflow: hidden;
-      transition: var(--transition-fast);
+    /* GPU-accelerated blur-up animation utilities */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      filter: blur(10px);
+      transition: opacity 1s var(--ease-out-expo),
+                  transform 1s var(--ease-out-expo),
+                  filter 1s var(--ease-out-expo);
     }
 
-    .accordion-header {
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 1.1rem;
+    section.active .reveal {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
     }
 
-    .accordion-header:hover {
-      color: var(--color-orange);
-    }
-
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.4s ease;
-      background: rgba(0, 0, 0, 0.2);
-      color: var(--color-text-muted);
-      font-size: 0.95rem;
-      padding: 0 20px;
-    }
-
-    .accordion-item.active .accordion-content {
-      max-height: 200px;
-      padding: 0 20px 20px 20px;
-    }
-
-    .accordion-item.active {
-      border-color: var(--color-orange-glow);
-    }
+    .delay-1 { transition-delay: 0.15s; }
+    .delay-2 { transition-delay: 0.3s; }
+    .delay-3 { transition-delay: 0.45s; }
+    .delay-4 { transition-delay: 0.6s; }
 
     /* ==========================================================================
-       5. HIGH-OCTANE GALLERY & VIDEO MODAL
+       2. INTRO OVERLAY (SPLASH SCREEN)
        ========================================================================== */
-    .gallery-section {
-      padding: 120px 0;
-    }
-
-    .interactive-gallery {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-top: 50px;
-    }
-
-    .gallery-card {
-      position: relative;
-      height: 380px;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .gallery-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.8s ease;
-    }
-
-    .gallery-card:hover img {
-      transform: scale(1.1);
-    }
-
-    .gallery-card-overlay {
-      position: absolute;
+    #intro-overlay {
+      position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(180deg, transparent 40%, rgba(3, 7, 18, 0.9) 100%);
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      z-index: 9999;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      padding: 30px;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.2s var(--ease-out-expo), visibility 1.2s;
+    }
+
+    #intro-overlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #intro-overlay video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .skip-prompt-wrap {
+      position: absolute;
+      bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 10000;
+    }
+
+    .skip-btn {
+      background: rgba(22, 46, 35, 0.85);
+      color: var(--text-white);
+      border: 1px solid var(--accent-sage);
+      padding: 0.6rem 1.4rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      backdrop-filter: blur(8px);
       transition: var(--transition-smooth);
     }
 
-    .play-btn-circle {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--color-orange);
+    .skip-btn:hover {
+      background: var(--accent-sage);
+      color: var(--bg-forest);
+    }
+
+    .skip-prompt {
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* ==========================================================================
+       3. NAVIGATION & PRESENTER HUD
+       ========================================================================== */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 2rem 4rem;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 30px var(--color-orange-glow);
-      margin-bottom: 16px;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    /* INCREASED LOGO SIZE FOR HIGH STAGE VISIBILITY */
+    .top-nav .brand-logo {
+      height: 64px;
+      pointer-events: auto;
       transition: transform 0.3s ease;
     }
 
-    .gallery-card:hover .play-btn-circle {
-      transform: scale(1.15);
+    .presenter-hud {
+      position: fixed;
+      bottom: 2rem;
+      right: 3rem;
+      background: rgba(22, 46, 35, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(143, 168, 155, 0.2);
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
-    /* ==========================================================================
-       6. LIGHTBOX & MODAL SYSTEM
-       ========================================================================== */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(3, 7, 18, 0.95);
-      backdrop-filter: blur(20px);
-      z-index: 2000;
+    .hud-counter {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--accent-sage);
+    }
+
+    .hud-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .hud-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-white);
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--transition-smooth);
+      transition: background 0.3s;
     }
 
-    .modal-overlay.active {
+    .hud-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .key-hints {
+      position: fixed;
+      bottom: 2rem;
+      left: 3rem;
+      font-size: 0.75rem;
+      color: rgba(234, 227, 210, 0.4);
+      z-index: 100;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       4. SECTION SPECIFIC STYLES
+       ========================================================================== */
+    
+    /* Hero Section */
+    .hero-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      width: 100%;
+      max-width: 1300px;
+      gap: 4rem;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-tagline {
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      color: var(--accent-sage-light);
+      font-style: italic;
+      font-family: var(--font-heading);
+      margin-bottom: 2rem;
+    }
+
+    .hero-img-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .hero-img-wrap img {
+      max-height: 70vh;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+    }
+
+    /* Problem Section */
+    .problem-content {
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .stat-callout {
+      font-size: clamp(4rem, 8vw, 9rem);
+      font-family: var(--font-heading);
+      color: var(--accent-sage);
+      line-height: 1;
+      margin: 1.5rem 0;
+      font-weight: 600;
+    }
+
+    /* Product Reveal Section */
+    .reveal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    .floating-product {
+      animation: float 6s ease-in-out infinite;
+      text-align: center;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(1deg); }
+    }
+
+    .feature-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(143, 168, 155, 0.15);
+      padding: 1.8rem;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: var(--transition-smooth);
+    }
+
+    .card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--accent-sage);
+      transform: translateY(-4px);
+    }
+
+    .card h4 {
+      color: var(--text-white);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    /* Interactive Details Section */
+    .details-interactive {
+      position: relative;
+      max-width: 1100px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .details-img-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    .hotspot {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-sage);
+      border: 2px solid var(--text-white);
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(143, 168, 155, 0.8);
+      transition: transform 0.3s;
+    }
+
+    .hotspot::after {
+      content: '';
+      position: absolute;
+      top: -6px; left: -6px; right: -6px; bottom: -6px;
+      border-radius: 50%;
+      border: 1px solid var(--accent-sage);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    .hotspot:hover {
+      transform: scale(1.2);
+    }
+
+    /* Hotspot positions on close-up image */
+    .hs-nib { top: 25%; left: 18%; }
+    .hs-body { top: 45%; left: 45%; }
+    .hs-capsule { top: 72%; left: 78%; }
+
+    .hotspot-card {
+      position: absolute;
+      width: 260px;
+      background: rgba(13, 28, 21, 0.95);
+      border: 1px solid var(--accent-sage);
+      padding: 1.2rem;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition-smooth);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+
+    .hotspot:hover + .hotspot-card,
+    .hotspot-card:hover {
       opacity: 1;
       pointer-events: auto;
     }
 
-    .modal-body {
-      max-width: 1000px;
-      width: 90%;
+    /* How It Works Section */
+    .process-flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 1200px;
+      width: 100%;
+      margin-top: 3rem;
+    }
+
+    .process-step {
+      background: rgba(22, 46, 35, 0.4);
+      border: 1px solid rgba(143, 168, 155, 0.1);
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      text-align: center;
       position: relative;
     }
 
-    .modal-close {
+    .step-num {
+      font-family: var(--font-heading);
+      font-size: 3.5rem;
+      color: rgba(143, 168, 155, 0.2);
       position: absolute;
-      top: -50px;
-      right: 0;
-      font-size: 2rem;
-      color: #FFF;
-      cursor: pointer;
+      top: 1rem;
+      right: 1.5rem;
     }
 
-    /* ==========================================================================
-       7. MODERNIZED ENQUIRY FORM & FOOTER
-       ========================================================================== */
-    .contact-section {
-      padding: 120px 0;
+    .step-title {
+      font-size: 1.5rem;
+      color: var(--text-white);
+      margin-bottom: 1rem;
     }
 
-    .form-wrapper {
-      padding: 50px;
-    }
-
-    .form-input {
+    /* Growth Story & Video Showcase Sections */
+    .video-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+      max-width: 1300px;
       width: 100%;
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      color: #FFF;
-      margin-bottom: 20px;
-      transition: var(--transition-fast);
     }
 
-    .form-input:focus {
-      border-color: var(--color-orange);
-      box-shadow: 0 0 15px var(--color-orange-glow);
-      background: rgba(255, 255, 255, 0.05);
+    .video-frame {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(143, 168, 155, 0.3);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      background: #000;
+      aspect-ratio: 16/9;
     }
 
-    select.form-input option {
-      background: var(--color-bg-dark);
-      color: #FFF;
+    .video-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
-    /* Footer */
-    .footer {
-      padding: 80px 0 40px;
-      border-top: 1px solid var(--color-border);
-      background: rgba(3, 7, 18, 0.95);
+    /* Packaging Section */
+    .packaging-layout {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      align-items: center;
+      gap: 4rem;
+      max-width: 1200px;
+      width: 100%;
     }
 
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-      .course-details-grid { grid-template-columns: 1fr; }
-      .interactive-gallery { grid-template-columns: 1fr; }
-      .hero-stats-bar { grid-template-columns: 1fr; }
+    /* Comparison Matrix Section */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      max-width: 1000px;
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    .comp-card {
+      padding: 3rem 2.5rem;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .comp-card.bad {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 100, 100, 0.15);
+    }
+
+    .comp-card.good {
+      background: rgba(22, 46, 35, 0.8);
+      border: 1px solid var(--accent-sage);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .comp-card h3 {
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .comp-list {
+      list-style: none;
+    }
+
+    .comp-list li {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1rem;
+    }
+
+    /* Brand Story Section */
+    .brand-story-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 1100px;
+      width: 100%;
+      margin-top: 3rem;
+    }
+
+    .dna-item {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      border: 1px solid rgba(143, 168, 155, 0.1);
+    }
+
+    .dna-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    /* Final Vision Section */
+    .final-content {
+      text-align: center;
+      max-width: 850px;
+    }
+
+    .final-logo {
+      height: 90px;
+      margin-bottom: 2.5rem;
+    }
+
+    .final-quote {
+      font-size: clamp(2.2rem, 4vw, 3.8rem);
+      font-family: var(--font-heading);
+      line-height: 1.2;
+      color: var(--text-white);
+      margin-bottom: 2rem;
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 900px) {
+      .top-nav .brand-logo {
+        height: 48px;
+      }
+      .hero-layout, .reveal-grid, .video-showcase, .packaging-layout, .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .process-flow, .brand-story-grid {
+        grid-template-columns: 1fr;
+      }
+      section {
+        padding: 6rem 5vw 4rem;
+        height: auto;
+        min-height: 100vh;
+      }
+      .presentation-container {
+        scroll-snap-type: none;
+      }
+      .feature-cards {
+        grid-template-columns: 1fr;
+      }
+      .key-hints {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- ==========================================
-       GLOWING NAVIGATION BAR
-       ========================================== -->
-  <nav class="navbar" id="navbar">
-    <div class="container nav-container">
-      <a href="#" class="brand-logo">
-        <img src="https://files.catbox.moe/8d0iv8.png" alt="Learning Inn Emblem">
-        <div>
-          <span class="brand-title">LEARNING INN</span>
-          <span class="brand-subtitle">MULTIMEDIA ACADEMY</span>
-        </div>
-      </a>
-
-      <ul class="nav-links">
-        <li><a href="#home" class="nav-link active">Home</a></li>
-        <li><a href="#courses" class="nav-link">Courses</a></li>
-        <li><a href="#experience" class="nav-link">Campus Life</a></li>
-        <li><a href="#contact" class="nav-link">Admissions</a></li>
-      </ul>
-
-      <a href="#contact" class="btn-glow">Apply Now</a>
+  <!-- ==========================================================================
+       INTRO OVERLAY (Auto-fade timer + Manual Skip & Start Button)
+       ========================================================================== -->
+  <div id="intro-overlay">
+    <video id="intro-video" autoplay muted playsinline>
+      <source src="assets/14140096_1785265876398524.mp4" type="video/mp4">
+    </video>
+    <div class="skip-prompt-wrap">
+      <button class="skip-btn" id="skip-btn">Start Presentation &rarr;</button>
+      <div class="skip-prompt">Press SPACE to Skip</div>
     </div>
+  </div>
+
+  <!-- FIXED NAVIGATION & PRESENTER HUD -->
+  <nav class="top-nav">
+    <img src="assets/Picsart_26-07-28_00-56-51-694.png" alt="VerDiA Logo" class="brand-logo">
   </nav>
 
-  <!-- ==========================================
-       HERO SECTION WITH PARTICLE CANVAS
-       ========================================== -->
-  <section class="hero" id="home">
-    <div class="hero-video-wrapper">
-      <video class="hero-video" autoplay muted loop playsinline poster="https://files.catbox.moe/9vy1b8.jpg">
-        <source src="https://files.catbox.moe/emk93e.mp4" type="video/mp4">
-      </video>
+  <div class="presenter-hud">
+    <span class="hud-counter" id="hud-counter">01 / 11</span>
+    <div class="hud-controls">
+      <button class="hud-btn" id="prev-btn" title="Previous (Up Arrow)">&#8593;</button>
+      <button class="hud-btn" id="next-btn" title="Next (Down Arrow)">&#8595;</button>
     </div>
+  </div>
 
-    <!-- Live Interactive Particle Overlay -->
-    <canvas id="particleCanvas"></canvas>
-    <div class="hero-overlay"></div>
+  <div class="key-hints">
+    [&uarr;/&darr;] Navigate &nbsp;|&nbsp; [P] Play/Pause &nbsp;|&nbsp; [F] Fullscreen &nbsp;|&nbsp; [M] Mute &nbsp;|&nbsp; [R] Reset
+  </div>
 
-    <div class="container">
-      <div class="hero-content">
-        <div class="badge-glow">Next-Gen Industry Institute</div>
-        <h1 class="hero-title">
-          Learn Today.<br>
-          <span class="gradient-orange">Lead Tomorrow.</span>
-        </h1>
-        <p class="hero-subtitle">
-          Master real-world English fluency, graphic design, and performance digital marketing through hands-on lab experiences.
+  <!-- ==========================================================================
+       PRESENTATION SLIDES CONTAINER
+       ========================================================================== -->
+  <main class="presentation-container" id="scroll-container">
+
+    <!-- SLIDE 1: HERO SECTION -->
+    <section id="slide-1" class="active">
+      <div class="hero-layout">
+        <div class="hero-text">
+          <span class="section-tag reveal">Introducing</span>
+          <h1 class="hero-title reveal delay-1">BloomPen<br><i style="font-weight: 300;">Terra Edition</i></h1>
+          <p class="hero-tagline reveal delay-2">"Write Today. Grow Tomorrow."</p>
+          <p class="reveal delay-3" style="max-width: 480px;">
+            The premium plantable pencil designed to bridge human thought and nature's lifecycle. Crafted for the eco-conscious mind.
+          </p>
+        </div>
+        <div class="hero-img-wrap reveal delay-2">
+          <img src="assets/59763.png" alt="VerDiA BloomPen Terra Edition Hero">
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <section id="slide-2">
+      <div class="problem-content">
+        <span class="section-tag reveal">The Ecological Friction</span>
+        <h2 class="reveal delay-1" style="font-size: clamp(2rem, 3.5vw, 3rem);">Billions of written instruments end up in landfills every year.</h2>
+        <div class="stat-callout reveal delay-2">15 Billion+</div>
+        <p class="reveal delay-3" style="font-size: 1.2rem; max-width: 650px; margin: 0 auto;">
+          Traditional wooden and plastic pencils are treated as disposable linear waste. Knowledge shouldn't leave a footprint of destruction behind.
         </p>
+      </div>
+    </section>
 
-        <div class="hero-actions">
-          <a href="#courses" class="btn-glow">Explore Programs</a>
-          <a href="#experience" class="btn-glow" style="background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); box-shadow: none;">Watch Showcase</a>
+    <!-- SLIDE 3: PRODUCT REVEAL -->
+    <section id="slide-3">
+      <div class="reveal-grid">
+        <div class="floating-product reveal">
+          <img src="assets/59685-removebg-preview.png" alt="BloomPen Product Render" style="max-height: 65vh;">
         </div>
-
-        <!-- Floating Animated Counter Bar -->
-        <div class="hero-stats-bar">
-          <div class="stat-item">
-            <span class="stat-number" data-target="98">0</span>
-            <span class="stat-label">% Graduate Success Rate</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number" data-target="5000">0</span>
-            <span class="stat-label">+ Certified Alumni</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number" data-target="100">0</span>
-            <span class="stat-label">% Practical Labs</span>
-          </div>
-        </div>
-</div>
-    </div>
-  </section>
-
-  <!-- ==========================================
- INTERACTIVE COURSE EXPLORER
- ========================================== -->
-  <section class="explorer-section" id="courses">
-    <div class="container">
-<div style="text-align: center; margin-bottom: 40px;">
-  <div class="badge-glow">Curriculum Showcase</div>
-  <h2 class="section-title">Master In-Demand Skills</h2>
-</div>
-
-<!-- Tab Navigation -->
-<div class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('cesol')">CESOL English</button>
-  <button class="tab-btn" onclick="switchTab('desol')">DESOL English</button>
-  <button class="tab-btn" onclick="switchTab('design')">Graphic Design</button>
-  <button class="tab-btn" onclick="switchTab('marketing')">Digital Marketing</button>
-</div>
-
-<!-- Tab Content Area -->
-<div class="tab-content">
-  <!-- CESOL -->
-  <div class="tab-pane active" id="cesol">
-    <div class="course-details-grid">
-      <div>
-        <h3 style="font-size: 2rem; margin-bottom: 16px;">Certificate in English (CESOL)</h3>
-        <p style="color: var(--color-text-muted); margin-bottom: 24px;">A complete 6-month immersion program designed to transform novice speakers into fluent, confident communicators.</p>
-        
-        <div class="accordion-item active">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Level 1: Beginner Mastery</span>
-            <span>+</span>
-          </div>
-          <div class="accordion-content">
-            Grammar foundation, accent reduction, basic vocabulary construction, and daily speaking exercises.
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Level 2: Intermediate Public Speaking</span>
-            <span>+</span>
-          </div>
-          <div class="accordion-content">
-            Presentation confidence, structural debate, vocal modulation, and group conversation control.
+        <div>
+          <span class="section-tag reveal">Sustainable Engineering</span>
+          <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 2rem;">Designed to give back to the Earth.</h2>
+          <div class="feature-cards">
+            <div class="card reveal delay-2">
+              <h4>Recycled Wood</h4>
+              <p>Sourced purely from post-industrial cedar fragments without harming standing forests.</p>
+            </div>
+            <div class="card reveal delay-2">
+              <h4>Seed Capsule</h4>
+              <p>Biodegradable cellulose tip protecting non-GMO organic botanical seeds.</p>
+            </div>
+            <div class="card reveal delay-3">
+              <h4>Sustainable Design</h4>
+              <p>Ergonomic graphite core optimized for extended writing lifespan and smooth draw.</p>
+            </div>
+            <div class="card reveal delay-3">
+              <h4>Educational Impact</h4>
+              <p>Empowering classroom innovation by turning completion into cultivation.</p>
+            </div>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="glass-card" style="padding: 40px;">
-        <h4 style="font-size: 1.4rem; margin-bottom: 20px;">Program Highlights</h4>
-        <ul style="list-style: none; line-height: 2;">
-          <li>✓ Duration: 6 Months</li>
-          <li>✓ Daily Interactive Speaking Labs</li>
-          <li>✓ Certification Upon Completion</li>
-          <li>✓ Accent & Phonetics Workshops</li>
-        </ul>
-        <a href="#contact" class="btn-glow" style="width: 100%; margin-top: 30px;">Enroll In CESOL</a>
-      </div>
+    <!-- SLIDE 4: PRODUCT DETAILS (Interactive Hotspots) -->
+    <section id="slide-4">
+    <div style="text-align: center; width: 100%;">
+    <span class="section-tag reveal">Precision Architecture</span>
+    <h2 class="reveal delay-1" style="font-size: 2.2rem; margin-bottom: 2.5rem;">Anatomy of Innovation</h2>
+    
+    <div class="details-interactive reveal delay-2" style="margin: 0 auto;">
+    <div class="details-img-container">
+    <img src="assets/59687-removebg-preview.png" alt="BloomPen Close Up">
+    
+    <!-- Hotspot 1: Graphite Nib -->
+    <div class="hotspot hs-nib"></div>
+    <div class="hotspot-card" style="top: 10%; left: 0%;">
+    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Smooth Graphite Core</h4>
+    <p style="font-size: 0.8rem;">Non-toxic, high-density graphite engineered for precision writing without breakage.</p>
     </div>
-  </div>
-
-  <!-- GRAPHIC DESIGN -->
-  <div class="tab-pane" id="design">
-    <div class="course-details-grid">
-      <div>
-        <h3 style="font-size: 2rem; margin-bottom: 16px;">Graphic Design & UI/UX</h3>
-        <p style="color: var(--color-text-muted); margin-bottom: 24px;">6-month production-focused visual creation course using Adobe Creative Suite and Figma.</p>
-        
-        <div class="accordion-item active">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Module 1: Photoshop & Photo Manipulation</span>
-            <span>+</span>
-          </div>
-          <div class="accordion-content">
-            Raster editing, color grading, compositing, visual effects, and high-end advertising graphics.
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Module 2: Illustrator Vector Art</span>
-            <span>+</span>
-          </div>
-          <div class="accordion-content">
-            Logo design, brand identity systems, vector illustrations, typography, and print design.
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Module 3: Figma UI/UX Prototyping</span>
-            <span>+</span>
-          </div>
-          <div class="accordion-content">
-            Wireframing, interactive app prototyping, design systems, and web layout engineering.
-          </div>
-        </div>
-      </div>
-
-      <div class="glass-card" style="padding: 40px;">
-        <h4 style="font-size: 1.4rem; margin-bottom: 20px;">Lab Capabilities</h4>
-        <ul style="list-style: none; line-height: 2;">
-          <li>✓ Duration: 6 Months</li>
-          <li>✓ 1 Hr Theory + 1 Hr Hands-on Lab</li>
-          <li>✓ Industry Portfolio Development</li>
-          <li>✓ Freelance Client Onboarding Coaching</li>
-        </ul>
-        <a href="#contact" class="btn-glow" style="width: 100%; margin-top: 30px;">Enroll In Design</a>
-      </div>
+    
+    <!-- Hotspot 2: Wooden Body -->
+    <div class="hotspot hs-body"></div>
+    <div class="hotspot-card" style="top: 30%; left: 30%;">
+    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Sustainably Sourced Cedar</h4>
+    <p style="font-size: 0.8rem;">Chemical-free, polished natural wood body designed for comfortable grip.</p>
     </div>
-  </div>
-</div>
+    
+    <!-- Hotspot 3: Seed Capsule -->
+    <div class="hotspot hs-capsule"></div>
+    <div class="hotspot-card" style="top: 55%; left: 60%;">
+    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Biodegradable Capsule</h4>
+    <p style="font-size: 0.8rem;">Activates instantly upon exposure to moisture and soil nutrients.</p>
     </div>
-  </section>
-
-  <!-- ==========================================
- CAMPUS LIFE & VIDEO GALLERY
- ========================================== -->
-  <section class="gallery-section" id="experience">
-    <div class="container">
-<div style="text-align: center; margin-bottom: 40px;">
-  <div class="badge-glow">Campus Atmosphere</div>
-  <h2 class="section-title">Extravagant Learning Experience</h2>
-</div>
-
-<div class="interactive-gallery">
-  <div class="gallery-card glass-card" onclick="openVideoModal()">
-    <img src="https://files.catbox.moe/1kxs4i.jpg" alt="Interactive Classroom">
-    <div class="gallery-card-overlay">
-      <div class="play-btn-circle">▶</div>
-      <h4 style="font-size: 1.2rem;">Live Interactive Labs</h4>
     </div>
-  </div>
-
-  <div class="gallery-card glass-card" onclick="openVideoModal()">
-    <img src="https://files.catbox.moe/cm1wyb.jpg" alt="Design Lab">
-    <div class="gallery-card-overlay">
-      <div class="play-btn-circle">▶</div>
-      <h4 style="font-size: 1.2rem;">High-Tech Workstations</h4>
     </div>
-  </div>
-
-  <div class="gallery-card glass-card" onclick="openVideoModal()">
-    <img src="https://files.catbox.moe/w35qro.jpg" alt="Speech Competition">
-    <div class="gallery-card-overlay">
-      <div class="play-btn-circle">▶</div>
-      <h4 style="font-size: 1.2rem;">Speech Competitions</h4>
     </div>
-  </div>
-</div>
+    </section>
+    
+    <!-- SLIDE 5 (NEW): LOGO ANIMATION EXPLANATION -->
+    <section id="slide-5">
+    <div class="video-showcase">
+    <div>
+    <span class="section-tag reveal">Brand Identity</span>
+    <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">The Genesis of VerDiA</h2>
+    <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+    A unified geometry expressing our core philosophy: combining knowledge with natural life cycles.
+    </p>
+    <p class="reveal delay-3" style="color: var(--accent-sage);">
+    "Connecting Knowledge with Nature."
+    </p>
     </div>
-  </section>
-
-  <!-- ==========================================
- MODAL VIDEO SHOWCASE
- ========================================== -->
-  <div class="modal-overlay" id="videoModal">
-    <div class="modal-body">
-<span class="modal-close" onclick="closeVideoModal()">&times;</span>
-<video controls style="width: 100%; border-radius: var(--radius-md);" id="modalVideo">
-  <source src="https://files.catbox.moe/emk93e.mp4" type="video/mp4">
-</video>
+    <div class="video-frame reveal delay-2">
+    <video id="logo-meaning-video" muted playsinline preload="auto">
+    <source src="assets/721237798_1785267715441587.mp4" type="video/mp4">
+    </video>
     </div>
-  </div>
-
-  <!-- ==========================================
- ADMISSIONS & FOOTER
- ========================================== -->
-  <section class="contact-section" id="contact">
-    <div class="container">
-<div class="glass-card form-wrapper">
-  <div style="text-align: center; margin-bottom: 30px;">
-    <h2 class="section-title">Begin Your Transformation</h2>
-    <p style="color: var(--color-text-muted);">Reserve your seat for the upcoming practical batch.</p>
-  </div>
-
-  <form id="admissionsForm" onsubmit="handleFormSubmit(event)">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-      <input type="text" class="form-input" placeholder="Full Name" required>
-      <input type="tel" class="form-input" placeholder="Phone Number" required>
     </div>
-    <select class="form-input" required>
-      <option value="">Select Program</option>
-      <option value="cesol">CESOL (English Language)</option>
-      <option value="desol">DESOL (Diploma in English)</option>
-      <option value="design">Graphic Design & UI/UX</option>
-      <option value="marketing">Digital Marketing</option>
-    </select>
-    <textarea class="form-input" rows="4" placeholder="Your Goals / Message"></textarea>
-    <button type="submit" class="btn-glow" style="width: 100%;">Submit Application</button>
-  </form>
-</div>
+    </section>
+    
+    <!-- SLIDE 6: HOW IT WORKS -->
+    <section id="slide-6">
+    <div style="max-width: 1200px; width: 100%; text-align: center;">
+    <span class="section-tag reveal">User Experience</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Circular Journey</h2>
+    
+    <div class="process-flow">
+    <div class="process-step reveal delay-1">
+    <span class="step-num">01</span>
+    <h3 class="step-title">Write</h3>
+    <p>Use the BloomPen standardly for sketching, note-taking, and capturing ideas until it reaches its stub.</p>
     </div>
-  </section>
-
-  <footer class="footer">
-    <div class="container" style="text-align: center;">
-<p style="color: var(--color-text-muted);">© Learning Inn. Engineered for Excellence.</p>
+    <div class="process-step reveal delay-2">
+    <span class="step-num">02</span>
+    <h3 class="step-title">Plant</h3>
+    <p>Insert the green capsule stub directly into moist soil at a 45-degree angle in sunlight.</p>
     </div>
-  </footer>
-
-  <!-- ==========================================
- INTERACTIVE JAVASCRIPT CONTROLLERS
- ========================================== -->
-  <script>
-    // 1. Particle Canvas System
-    const canvas = document.getElementById('particleCanvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-
-    function resizeCanvas() {
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+    <div class="process-step reveal delay-3">
+    <span class="step-num">03</span>
+    <h3 class="step-title">Grow</h3>
+    <p>Water regularly. The capsule dissolves within 48 hours, sprouting vibrant herbs or flora.</p>
+    </div>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 7: GROWTH STORY (Video Segment) -->
+    <section id="slide-7">
+    <div class="video-showcase">
+    <div>
+    <span class="section-tag reveal">Life Cycle Transformation</span>
+    <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">From Thought to Living Nature.</h2>
+    <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+    Watch the transition unfold. When your pencil reaches the end of its functional life, its secondary journey begins.
+    </p>
+    <p class="reveal delay-3" style="color: var(--accent-sage);">
+    "Decomposition gives way to living flora."
+    </p>
+    </div>
+    <div class="video-frame reveal delay-2">
+    <video id="growth-video" muted playsinline preload="auto">
+    <source src="assets/634969515_1785227179024768.mp4" type="video/mp4">
+    </video>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 8: PACKAGING EXPERIENCE -->
+    <section id="slide-8">
+    <div class="packaging-layout">
+    <div class="reveal">
+    <img src="assets/59829.png" alt="VerDiA Packaging Kit" style="max-height: 60vh;">
+    </div>
+    <div>
+    <span class="section-tag reveal">Unboxing Innovation</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 1.5rem;">The VerDiA Growth Kit</h2>
+    <p class="reveal delay-2" style="margin-bottom: 1.5rem;">
+    Every edition arrives in 100% biodegradable, seed-infused packaging paper. Unbox a sleek, plastic-free presentation designed to make sustainability feel luxurious.
+    </p>
+    <ul class="reveal delay-3" style="list-style: none; line-height: 2;">
+    <li>&#10003; Minimum 5 Terra Edition Pencils</li>
+    <li>&#10003; Soil Activation Guide included</li>
+    <li>&#10003; Zero synthetic adhesives or plastic foils</li>
+    </ul>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 9: WHY BLOOMPEN IS DIFFERENT (Comparison Matrix) -->
+    <section id="slide-9">
+    <div style="text-align: center; width: 100%;">
+    <span class="section-tag reveal">Market Advantage</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem;">Why BloomPen Matters</h2>
+    
+    <div class="comparison-grid reveal delay-2" style="margin: 0 auto;">
+    <div class="comp-card bad">
+    <h3><span style="color: #FF6B6B;">&#10007;</span> Traditional Pencil</h3>
+    <ul class="comp-list">
+    <li><span style="color: #FF6B6B;">&bull;</span> Extracted from virgin timber forests</li>
+    <li><span style="color: #FF6B6B;">&bull;</span> Ends as landfilled toxic stub waste</li>
+    <li><span style="color: #FF6B6B;">&bull;</span> Synthetic rubber and metal ferrules</li>
+    <li><span style="color: #FF6B6B;">&bull;</span> Linear consumable mindset</li>
+    </ul>
+    </div>
+    <div class="comp-card good">
+    <h3><span style="color: var(--accent-sage);">&#10004;</span> BloomPen Terra</h3>
+    <ul class="comp-list">
+    <li><span style="color: var(--accent-sage);">&bull;</span> Reclaimed cedar & non-toxic lead</li>
+    <li><span style="color: var(--accent-sage);">&bull;</span> Grows into organic flora after use</li>
+    <li><span style="color: var(--accent-sage);">&bull;</span> 100% compostable capsule core</li>
+    <li><span style="color: var(--accent-sage);">&bull;</span> Circular regenerative ecosystem</li>
+    </ul>
+    </div>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 10: BRAND STORY & LOGO DNA -->
+    <section id="slide-10">
+    <div style="text-align: center; max-width: 1100px; width: 100%;">
+    <span class="section-tag reveal">Identity Architecture</span>
+    <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Meaning Behind Our Logo</h2>
+    
+    <div class="brand-story-grid">
+    <div class="dna-item reveal delay-1">
+    <span class="dna-icon">&#9997;</span>
+    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Pencil Nib</h3>
+    <p style="font-size: 0.9rem;">Symbolizing <strong>Knowledge</strong>, creativity, human expression, and education.</p>
+    </div>
+    <div class="dna-item reveal delay-2">
+    <span class="dna-icon">&#127811;</span>
+    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Leaves</h3>
+    <p style="font-size: 0.9rem;">Symbolizing <strong>Nature</strong>, environmental responsibility, and ecological balance.</p>
+    </div>
+    <div class="dna-item reveal delay-3">
+    <span class="dna-icon">&#127793;</span>
+    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Seed</h3>
+    <p style="font-size: 0.9rem;">Symbolizing <strong>Growth</strong>, potential, future impact, and regenerative design.</p>
+    </div>
+    </div>
+    </div>
+    </section>
+    
+    <!-- SLIDE 11: FINAL VISION -->
+    <section id="slide-11">
+    <div class="final-content">
+    <img src="assets/Picsart_26-07-28_00-56-51-694.png" alt="VerDiA Logo" class="final-logo reveal">
+    <h2 class="final-quote reveal delay-1">"Every idea has the power to grow."</h2>
+    <p class="reveal delay-2" style="font-size: 1.2rem; color: var(--accent-sage-light); margin-bottom: 2rem;">
+    Thank you. Join us in shaping a regenerative future.
+    </p>
+    <span class="section-tag reveal delay-3" style="letter-spacing: 0.4em;">VerDiA &bull; Student Innovation 2026</span>
+    </div>
+    </section>
+    
+    </main>
+    
+    <!-- ==========================================================================
+    JAVASCRIPT: CONTROLS, ANIMATIONS & STAGE MECHANICS
+    ========================================================================== -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // Elements
+    const introOverlay = document.getElementById('intro-overlay');
+    const introVideo = document.getElementById('intro-video');
+    const skipBtn = document.getElementById('skip-btn');
+    const container = document.getElementById('scroll-container');
+    const sections = document.querySelectorAll('section');
+    const hudCounter = document.getElementById('hud-counter');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const logoMeaningVideo = document.getElementById('logo-meaning-video');
+    const growthVideo = document.getElementById('growth-video');
+    
+    let currentIndex = 0;
+    let isMuted = false;
+    
+    /* ----------------------------------------------------------------------
+    1. INTRO OVERLAY LOGIC (Auto-fade + Manual Skip Button)
+    ---------------------------------------------------------------------- */
+    const dismissIntro = () => {
+    if (!introOverlay.classList.contains('fade-out')) {
+    introOverlay.classList.add('fade-out');
+    setTimeout(() => introOverlay.remove(), 1200);
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    class Particle {
-constructor() {
-  this.x = Math.random() * canvas.width;
-  this.y = Math.random() * canvas.height;
-  this.size = Math.random() * 2 + 1;
-  this.speedX = Math.random() * 1 - 0.5;
-  this.speedY = Math.random() * 1 - 0.5;
-}
-
-update() {
-  this.x += this.speedX;
-  this.y += this.speedY;
-
-  if (this.x > canvas.width) this.x = 0;
-  if (this.x < 0) this.x = canvas.width;
-  if (this.y > canvas.height) this.y = 0;
-  if (this.y < 0) this.y = canvas.height;
-}
-
-draw() {
-  ctx.fillStyle = 'rgba(255, 107, 0, 0.5)';
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-  ctx.fill();
-}
-    }
-
-    function initParticles() {
-particles = [];
-for (let i = 0; i < 60; i++) {
-  particles.push(new Particle());
-}
-    }
-    initParticles();
-
-    function animateParticles() {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-particles.forEach(p => {
-  p.update();
-  p.draw();
-});
-requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
-
-    // 2. Animated Number Counters
-    const counters = document.querySelectorAll('.stat-number');
-    let animated = false;
-
-    window.addEventListener('scroll', () => {
-const scrollPos = window.scrollY + window.innerHeight;
-const statsPos = document.querySelector('.hero-stats-bar').offsetTop;
-
-if (scrollPos > statsPos && !animated) {
-  animated = true;
-  counters.forEach(counter => {
-    const target = +counter.getAttribute('data-target');
-    let count = 0;
-    const speed = target / 50;
-
-    const updateCount = () => {
-      count += speed;
-      if (count < target) {
-        counter.innerText = Math.ceil(count);
-        setTimeout(updateCount, 30);
-      } else {
-        counter.innerText = target;
-      }
     };
-    updateCount();
-  });
-}
+    
+    // Auto dismiss after 6.5 seconds max
+    const autoSkipTimer = setTimeout(dismissIntro, 6500);
+    
+    // Dismiss on video end
+    if (introVideo) {
+    introVideo.addEventListener('ended', dismissIntro);
+    }
+    
+    // Manual dismiss on button click or background click
+    if (skipBtn) {
+    skipBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearTimeout(autoSkipTimer);
+    dismissIntro();
     });
-
-    // 3. Tab Switcher System
-    function switchTab(tabId) {
-document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-
-event.target.classList.add('active');
-document.getElementById(tabId).classList.add('active');
     }
-
-    // 4. Accordion Toggle System
-    function toggleAccordion(element) {
-const item = element.parentElement;
-item.classList.toggle('active');
+    
+    introOverlay.addEventListener('click', () => {
+    clearTimeout(autoSkipTimer);
+    dismissIntro();
+    });
+    
+    /* ----------------------------------------------------------------------
+    2. NAVIGATION & HUD UPDATES
+    ---------------------------------------------------------------------- */
+    const updateHUD = (index) => {
+    const formattedCurrent = String(index + 1).padStart(2, '0');
+    const formattedTotal = String(sections.length).padStart(2, '0');
+    hudCounter.textContent = `${formattedCurrent} / ${formattedTotal}`;
+    };
+    
+    const navigateToSlide = (index) => {
+    if (index < 0 || index >= sections.length) return;
+    currentIndex = index;
+    sections[currentIndex].scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    prevBtn.addEventListener('click', () => navigateToSlide(currentIndex - 1));
+    nextBtn.addEventListener('click', () => navigateToSlide(currentIndex + 1));
+    
+    /* ----------------------------------------------------------------------
+    3. OBSERVER FOR SECTION ANIMATIONS & VIDEO TRIGGERING
+    ---------------------------------------------------------------------- */
+    const observerOptions = {
+    root: container,
+    threshold: 0.5
+    };
+    
+    const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+    if (entry.isIntersecting) {
+    entry.target.classList.add('active');
+    
+    // Find index of current active slide
+    const index = Array.from(sections).indexOf(entry.target);
+    currentIndex = index;
+    updateHUD(index);
+    
+    // Handle Slide 5 Video (Logo Meaning)
+    if (entry.target.id === 'slide-5' && logoMeaningVideo) {
+    logoMeaningVideo.currentTime = 0;
+    logoMeaningVideo.play().catch(e => console.log('Autoplay blocked:', e));
     }
-
-    // 5. Video Modal System
-    function openVideoModal() {
-const modal = document.getElementById('videoModal');
-const video = document.getElementById('modalVideo');
-modal.classList.add('active');
-video.play();
+    
+    // Handle Slide 7 Video (Growth Story)
+    if (entry.target.id === 'slide-7' && growthVideo) {
+    growthVideo.currentTime = 0;
+    growthVideo.play().catch(e => console.log('Autoplay blocked:', e));
     }
-
-    function closeVideoModal() {
-const modal = document.getElementById('videoModal');
-const video = document.getElementById('modalVideo');
-modal.classList.remove('active');
-video.pause();
+    } else {
+    // Pause videos when leaving respective sections
+    if (entry.target.id === 'slide-5' && logoMeaningVideo) {
+    logoMeaningVideo.pause();
     }
-
-    // Form Handling
-    function handleFormSubmit(e) {
-e.preventDefault();
-alert('Application Received! Admissions will contact you shortly.');
-e.target.reset();
+    if (entry.target.id === 'slide-7' && growthVideo) {
+    growthVideo.pause();
     }
-  </script>
-</body>
-</html>
+    }
+    });
+    }, observerOptions);
+    
+    sections.forEach(section => sectionObserver.observe(section));
+    
+    /* ----------------------------------------------------------------------
+    4. KEYBOARD SHORTCUTS (STAGE PRESENTER CONTROLS)
+    ---------------------------------------------------------------------- */
+    document.addEventListener('keydown', (e) => {
+    // Skip intro on Space key if active
+    if (!introOverlay.classList.contains('fade-out') && (e.code === 'Space' || e.code === 'Enter')) {
+    e.preventDefault();
+    clearTimeout(autoSkipTimer);
+    dismissIntro();
+    return;
+    }
+    
+    switch (e.code) {
+    case 'ArrowDown':
+    case 'ArrowRight':
+    case 'Space':
+    e.preventDefault();
+    navigateToSlide(currentIndex + 1);
+    break;
+    
+    case 'ArrowUp':
+    case 'ArrowLeft':
+    e.preventDefault();
+    navigateToSlide(currentIndex - 1);
+    break;
+    
+    case 'KeyP': // [P] Toggle Play/Pause on current video
+    e.preventDefault();
+    const activeVideo = sections[currentIndex].querySelector('video');
+    if (activeVideo) {
+    if (activeVideo.paused) {
+    activeVideo.play().catch(err => console.log(err));
+    } else {
+    activeVideo.pause();
+    }
+    }
+    break;
+    
+    case 'KeyF': // [F] Toggle Fullscreen Mode
+    e.preventDefault();
+    if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => console.log(err));
+    } else {
+    document.exitFullscreen().catch(err => console.log(err));
+    }
+    break;
+    
+    case 'KeyM': // [M] Toggle Audio Mute across all videos
+    e.preventDefault();
+    isMuted = !isMuted;
+    if (logoMeaningVideo) logoMeaningVideo.muted = isMuted;
+    if (growthVideo) growthVideo.muted = isMuted;
+    if (introVideo) introVideo.muted = isMuted;
+    break;
+    
+    case 'KeyR': // [R] Restart Presentation
+    e.preventDefault();
+    navigateToSlide(0);
+    break;
+    }
+    });
+    });
+    </script>
+    </body>
+    </html>           });
+            </script>
+            </body>
+            </html>
