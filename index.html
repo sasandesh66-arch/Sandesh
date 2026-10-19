@@ -1,1111 +1,1283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VerDiA — BloomPen Terra Edition</title>
-  
-  <!-- Typography: Inter & Playfair Display for Apple-esque Luxury Feel -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-
-  <style>
-    /* ==========================================================================
-       1. CSS VARIABLES & SYSTEM RESET
-       ========================================================================== */
-    :root {
-      --bg-forest: #0D1C15;
-      --bg-forest-light: #162E23;
-      --accent-sage: #8FA89B;
-      --accent-sage-light: #C2D4CB;
-      --text-beige: #EAE3D2;
-      --text-white: #FFFFFF;
-      --text-muted: #A3B0A8;
-      --gold-accent: #D4AF37;
-      
-      --font-heading: 'Playfair Display', Georgia, serif;
-      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-      --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      background-color: var(--bg-forest);
-      color: var(--text-beige);
-      font-family: var(--font-body);
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
-
-    /* Snap-scroll container for presenter mode */
-    .presentation-container {
-      height: 100vh;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      scroll-behavior: smooth;
-    }
-
-    section {
-      height: 100vh;
-      width: 100vw;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4rem 8vw;
-      overflow: hidden;
-    }
-
-    /* Standardized typography */
-    h1, h2, h3 {
-      font-family: var(--font-heading);
-      color: var(--text-white);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-    }
-
-    .section-tag {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      color: var(--accent-sage);
-      margin-bottom: 1.2rem;
-      display: block;
-      font-weight: 600;
-    }
-
-    p {
-      color: var(--text-beige);
-      font-weight: 300;
-      line-height: 1.7;
-    }
-
-    img, video {
-      max-width: 100%;
-      height: auto;
-      user-select: none;
-    }
-
-    /* GPU-accelerated blur-up animation utilities */
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px) scale(0.98);
-      filter: blur(10px);
-      transition: opacity 1s var(--ease-out-expo),
-                  transform 1s var(--ease-out-expo),
-                  filter 1s var(--ease-out-expo);
-    }
-
-    section.active .reveal {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
-    }
-
-    .delay-1 { transition-delay: 0.15s; }
-    .delay-2 { transition-delay: 0.3s; }
-    .delay-3 { transition-delay: 0.45s; }
-    .delay-4 { transition-delay: 0.6s; }
-
-    /* ==========================================================================
-       2. INTRO OVERLAY (SPLASH SCREEN)
-       ========================================================================== */
-    #intro-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #000;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 1.2s var(--ease-out-expo), visibility 1.2s;
-    }
-
-    #intro-overlay.fade-out {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    #intro-overlay video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .skip-prompt-wrap {
-      position: absolute;
-      bottom: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      z-index: 10000;
-    }
-
-    .skip-btn {
-      background: rgba(22, 46, 35, 0.85);
-      color: var(--text-white);
-      border: 1px solid var(--accent-sage);
-      padding: 0.6rem 1.4rem;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      backdrop-filter: blur(8px);
-      transition: var(--transition-smooth);
-    }
-
-    .skip-btn:hover {
-      background: var(--accent-sage);
-      color: var(--bg-forest);
-    }
-
-    .skip-prompt {
-      font-size: 0.8rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.6);
-      background: rgba(0, 0, 0, 0.4);
-      padding: 0.6rem 1rem;
-      border-radius: 20px;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    /* ==========================================================================
-       3. NAVIGATION & PRESENTER HUD
-       ========================================================================== */
-    .top-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 2rem 4rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      pointer-events: none;
-    }
-
-    /* INCREASED LOGO SIZE FOR HIGH STAGE VISIBILITY */
-    .top-nav .brand-logo {
-      height: 64px;
-      pointer-events: auto;
-      transition: transform 0.3s ease;
-    }
-
-    .presenter-hud {
-      position: fixed;
-      bottom: 2rem;
-      right: 3rem;
-      background: rgba(22, 46, 35, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(143, 168, 155, 0.2);
-      padding: 0.6rem 1.2rem;
-      border-radius: 40px;
-      display: flex;
-      align-items: center;
-      gap: 1.2rem;
-      z-index: 100;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .hud-counter {
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      color: var(--accent-sage);
-    }
-
-    .hud-controls {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .hud-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-white);
-      cursor: pointer;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s;
-    }
-
-    .hud-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .key-hints {
-      position: fixed;
-      bottom: 2rem;
-      left: 3rem;
-      font-size: 0.75rem;
-      color: rgba(234, 227, 210, 0.4);
-      z-index: 100;
-      letter-spacing: 0.05em;
-      pointer-events: none;
-    }
-
-    /* ==========================================================================
-       4. SECTION SPECIFIC STYLES
-       ========================================================================== */
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S & A Tuitions | Class 6 English Professional Assessment (Units 1, 2 & 3)</title>
+    <!-- Google Fonts for Luxury Typographic Feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    /* Hero Section */
-    .hero-layout {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      align-items: center;
-      width: 100%;
-      max-width: 1300px;
-      gap: 4rem;
-    }
+    <style>
+        :root {
+            --primary: #0f172a; /* Professional Slate Navy */
+            --primary-light: #1e293b;
+            --accent: #d97706; /* Luxury Warm Gold/Amber */
+            --accent-hover: #b45309;
+            --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+            --bg-canvas: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-heading: #0f172a;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --shadow-luxury: 0 20px 40px -10px rgba(15, 23, 42, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .hero-title {
-      font-size: clamp(3rem, 5vw, 5.5rem);
-      line-height: 1.05;
-      margin-bottom: 1.5rem;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    .hero-tagline {
-      font-size: clamp(1.2rem, 2vw, 1.8rem);
-      color: var(--accent-sage-light);
-      font-style: italic;
-      font-family: var(--font-heading);
-      margin-bottom: 2rem;
-    }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
 
-    .hero-img-wrap {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      position: relative;
-    }
+        /* Luxury Header */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid var(--accent);
+        }
 
-    .hero-img-wrap img {
-      max-height: 70vh;
-      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
-    }
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    /* Problem Section */
-    .problem-content {
-      max-width: 900px;
-      text-align: center;
-    }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-    .stat-callout {
-      font-size: clamp(4rem, 8vw, 9rem);
-      font-family: var(--font-heading);
-      color: var(--accent-sage);
-      line-height: 1;
-      margin: 1.5rem 0;
-      font-weight: 600;
-    }
+        .brand-logo i {
+            font-size: 2rem;
+            color: var(--accent);
+        }
 
-    /* Product Reveal Section */
-    .reveal-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 4rem;
-      max-width: 1300px;
-      width: 100%;
-    }
+        .brand-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .floating-product {
-      animation: float 6s ease-in-out infinite;
-      text-align: center;
-    }
+        .brand-text p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-18px) rotate(1deg); }
-    }
+        .timer-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #f8fafc;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
+        }
 
-    .feature-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
+        .timer-badge i {
+            color: var(--accent);
+            animation: pulse 1.5s infinite;
+        }
 
-    .card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(143, 168, 155, 0.15);
-      padding: 1.8rem;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      transition: var(--transition-smooth);
-    }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
 
-    .card:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: var(--accent-sage);
-      transform: translateY(-4px);
-    }
+        /* Main Container */
+        .main-wrapper {
+            max-width: 900px;
+            width: 90%;
+            margin: 3rem auto;
+            flex: 1;
+        }
 
-    .card h4 {
-      color: var(--text-white);
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
-    }
+        /* Card System */
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 3.5rem;
+            box-shadow: var(--shadow-luxury);
+            border: 1px solid var(--border-color);
+            position: relative;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
 
-    .card p {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    /* Interactive Details Section */
-    .details-interactive {
-      position: relative;
-      max-width: 1100px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+        /* Welcome / Registration Screen */
+        #welcome-screen h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            color: var(--text-heading);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
 
-    .details-img-container {
-      position: relative;
-      width: 100%;
-      max-width: 800px;
-      text-align: center;
-    }
+        #welcome-screen .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 2.5rem;
+            font-size: 1.05rem;
+        }
 
-    .hotspot {
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--accent-sage);
-      border: 2px solid var(--text-white);
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(143, 168, 155, 0.8);
-      transition: transform 0.3s;
-    }
+        .instructions-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 2.5rem;
+        }
 
-    .hotspot::after {
-      content: '';
-      position: absolute;
-      top: -6px; left: -6px; right: -6px; bottom: -6px;
-      border-radius: 50%;
-      border: 1px solid var(--accent-sage);
-      animation: pulse 2s infinite;
-    }
+        .instructions-box h4 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
 
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.8); opacity: 0; }
-    }
+        .instructions-box ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
 
-    .hotspot:hover {
-      transform: scale(1.2);
-    }
+        .instructions-box li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #475569;
+        }
 
-    /* Hotspot positions on close-up image */
-    .hs-nib { top: 25%; left: 18%; }
-    .hs-body { top: 45%; left: 45%; }
-    .hs-capsule { top: 72%; left: 78%; }
+        .instructions-box li i {
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
 
-    .hotspot-card {
-      position: absolute;
-      width: 260px;
-      background: rgba(13, 28, 21, 0.95);
-      border: 1px solid var(--accent-sage);
-      padding: 1.2rem;
-      border-radius: 8px;
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--transition-smooth);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      z-index: 10;
-    }
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
 
-    .hotspot:hover + .hotspot-card,
-    .hotspot-card:hover {
-      opacity: 1;
-      pointer-events: auto;
-    }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            color: var(--text-heading);
+            font-size: 0.95rem;
+        }
 
-    /* How It Works Section */
-    .process-flow {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-      max-width: 1200px;
-      width: 100%;
-      margin-top: 3rem;
-    }
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-family: inherit;
+            transition: var(--transition);
+            background: #fff;
+        }
 
-    .process-step {
-      background: rgba(22, 46, 35, 0.4);
-      border: 1px solid rgba(143, 168, 155, 0.1);
-      padding: 3rem 2rem;
-      border-radius: 16px;
-      text-align: center;
-      position: relative;
-    }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
+        }
 
-    .step-num {
-      font-family: var(--font-heading);
-      font-size: 3.5rem;
-      color: rgba(143, 168, 155, 0.2);
-      position: absolute;
-      top: 1rem;
-      right: 1.5rem;
-    }
+        /* Luxury Button */
+        .btn-luxury {
+            background: var(--gold-gradient);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 1.1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 20px -5px rgba(217, 119, 6, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
 
-    .step-title {
-      font-size: 1.5rem;
-      color: var(--text-white);
-      margin-bottom: 1rem;
-    }
+        .btn-luxury:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(217, 119, 6, 0.5);
+        }
 
-    /* Growth Story & Video Showcase Sections */
-    .video-showcase {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 4rem;
-      max-width: 1300px;
-      width: 100%;
-    }
+        /* Quiz Interface */
+        #quiz-screen {
+            display: none;
+        }
 
-    .video-frame {
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid rgba(143, 168, 155, 0.3);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-      background: #000;
-      aspect-ratio: 16/9;
-    }
+        .quiz-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
 
-    .video-frame video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+        .quiz-progress-fill {
+            height: 100%;
+            background: var(--gold-gradient);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
 
-    /* Packaging Section */
-    .packaging-layout {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      align-items: center;
-      gap: 4rem;
-      max-width: 1200px;
-      width: 100%;
-    }
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    /* Comparison Matrix Section */
-    .comparison-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2.5rem;
-      max-width: 1000px;
-      width: 100%;
-      margin-top: 2rem;
-    }
+        .question-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
 
-    .comp-card {
-      padding: 3rem 2.5rem;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-    }
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
 
-    .comp-card.bad {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 100, 100, 0.15);
-    }
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 1.15rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #ffffff;
+            font-weight: 500;
+            color: var(--text-main);
+        }
 
-    .comp-card.good {
-      background: rgba(22, 46, 35, 0.8);
-      border: 1px solid var(--accent-sage);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
+        .option-label:hover {
+            border-color: var(--accent);
+            background: #fffbeb;
+            transform: translateX(4px);
+        }
 
-    .comp-card h3 {
-      font-size: 1.6rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
+        .option-label input[type="radio"] {
+            margin-right: 15px;
+            accent-color: var(--accent);
+            transform: scale(1.2);
+        }
 
-    .comp-list {
-      list-style: none;
-    }
+        .option-label.selected {
+            border-color: var(--accent);
+            background: #fffbeb;
+            color: #b45309;
+            font-weight: 600;
+        }
 
-    .comp-list li {
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      font-size: 1rem;
-    }
+        .quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
 
-    /* Brand Story Section */
-    .brand-story-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-      max-width: 1100px;
-      width: 100%;
-      margin-top: 3rem;
-    }
+        .btn-nav {
+            padding: 0.8rem 1.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-heading);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .dna-item {
-      text-align: center;
-      padding: 2rem;
-      background: rgba(255,255,255,0.02);
-      border-radius: 12px;
-      border: 1px solid rgba(143, 168, 155, 0.1);
-    }
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #f1f5f9;
+        }
 
-    .dna-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      display: block;
-    }
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
 
-    /* Final Vision Section */
-    .final-content {
-      text-align: center;
-      max-width: 850px;
-    }
+        .btn-submit-quiz {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-    .final-logo {
-      height: 90px;
-      margin-bottom: 2.5rem;
-    }
+        .btn-submit-quiz:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
 
-    .final-quote {
-      font-size: clamp(2.2rem, 4vw, 3.8rem);
-      font-family: var(--font-heading);
-      line-height: 1.2;
-      color: var(--text-white);
-      margin-bottom: 2rem;
-    }
+        /* Results & Teacher Monitor Dashboard */
+        #results-screen {
+            display: none;
+        }
 
-    /* RESPONSIVE DESIGN */
-    @media (max-width: 900px) {
-      .top-nav .brand-logo {
-        height: 48px;
-      }
-      .hero-layout, .reveal-grid, .video-showcase, .packaging-layout, .comparison-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
-      .process-flow, .brand-story-grid {
-        grid-template-columns: 1fr;
-      }
-      section {
-        padding: 6rem 5vw 4rem;
-        height: auto;
-        min-height: 100vh;
-      }
-      .presentation-container {
-        scroll-snap-type: none;
-      }
-      .feature-cards {
-        grid-template-columns: 1fr;
-      }
-      .key-hints {
-        display: none;
-      }
-    }
-  </style>
+        .results-header-container {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .results-header-icon {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        #results-screen h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--text-heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .score-card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .score-metric-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .score-metric-card h3 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+        }
+
+        .score-metric-card p {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .candidate-summary {
+            background: #f1f5f9;
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-heading);
+            text-align: center;
+        }
+
+        /* Teacher Live Telemetry Monitor Box */
+        .teacher-monitor-box {
+            background: #e0f2fe;
+            border: 1px solid #7dd3fc;
+            border-left: 5px solid #0284c7;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .teacher-monitor-box h4 {
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .teacher-monitor-box p {
+            font-size: 0.95rem;
+            color: #0c4a6e;
+        }
+
+        /* Detailed Mistake Review Section */
+        .review-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--text-heading);
+            margin: 2.5rem 0 1.5rem 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .mistake-card {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-left: 5px solid var(--danger);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+
+        .mistake-card.all-correct {
+            border-left-color: var(--success);
+            background: #f0fdf4;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .mistake-q-num {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.4rem;
+        }
+
+        .mistake-q-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 1rem;
+        }
+
+        .mistake-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .wrong-ans {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .correct-ans {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .explanation-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .explanation-box b {
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Responsive Design */
+        @media(max-width: 768px) {
+            .card {
+                padding: 2rem 1.5rem;
+            }
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            .brand-logo {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .mistake-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- ==========================================================================
-       INTRO OVERLAY (Auto-fade timer + Manual Skip & Start Button)
-       ========================================================================== -->
-  <div id="intro-overlay">
-    <video id="intro-video" autoplay muted playsinline>
-      <source src="assets/14140096_1785265876398524.mp4" type="video/mp4">
-    </video>
-    <div class="skip-prompt-wrap">
-      <button class="skip-btn" id="skip-btn">Start Presentation &rarr;</button>
-      <div class="skip-prompt">Press SPACE to Skip</div>
-    </div>
-  </div>
-
-  <!-- FIXED NAVIGATION & PRESENTER HUD -->
-  <nav class="top-nav">
-    <img src="assets/Picsart_26-07-28_00-56-51-694.png" alt="VerDiA Logo" class="brand-logo">
-  </nav>
-
-  <div class="presenter-hud">
-    <span class="hud-counter" id="hud-counter">01 / 11</span>
-    <div class="hud-controls">
-      <button class="hud-btn" id="prev-btn" title="Previous (Up Arrow)">&#8593;</button>
-      <button class="hud-btn" id="next-btn" title="Next (Down Arrow)">&#8595;</button>
-    </div>
-  </div>
-
-  <div class="key-hints">
-    [&uarr;/&darr;] Navigate &nbsp;|&nbsp; [P] Play/Pause &nbsp;|&nbsp; [F] Fullscreen &nbsp;|&nbsp; [M] Mute &nbsp;|&nbsp; [R] Reset
-  </div>
-
-  <!-- ==========================================================================
-       PRESENTATION SLIDES CONTAINER
-       ========================================================================== -->
-  <main class="presentation-container" id="scroll-container">
-
-    <!-- SLIDE 1: HERO SECTION -->
-    <section id="slide-1" class="active">
-      <div class="hero-layout">
-        <div class="hero-text">
-          <span class="section-tag reveal">Introducing</span>
-          <h1 class="hero-title reveal delay-1">BloomPen<br><i style="font-weight: 300;">Terra Edition</i></h1>
-          <p class="hero-tagline reveal delay-2">"Write Today. Grow Tomorrow."</p>
-          <p class="reveal delay-3" style="max-width: 480px;">
-            The premium plantable pencil designed to bridge human thought and nature's lifecycle. Crafted for the eco-conscious mind.
-          </p>
-        </div>
-        <div class="hero-img-wrap reveal delay-2">
-          <img src="assets/59763.png" alt="VerDiA BloomPen Terra Edition Hero">
-        </div>
-      </div>
-    </section>
-
-    <!-- SLIDE 2: THE PROBLEM -->
-    <section id="slide-2">
-      <div class="problem-content">
-        <span class="section-tag reveal">The Ecological Friction</span>
-        <h2 class="reveal delay-1" style="font-size: clamp(2rem, 3.5vw, 3rem);">Billions of written instruments end up in landfills every year.</h2>
-        <div class="stat-callout reveal delay-2">15 Billion+</div>
-        <p class="reveal delay-3" style="font-size: 1.2rem; max-width: 650px; margin: 0 auto;">
-          Traditional wooden and plastic pencils are treated as disposable linear waste. Knowledge shouldn't leave a footprint of destruction behind.
-        </p>
-      </div>
-    </section>
-
-    <!-- SLIDE 3: PRODUCT REVEAL -->
-    <section id="slide-3">
-      <div class="reveal-grid">
-        <div class="floating-product reveal">
-          <img src="assets/59685-removebg-preview.png" alt="BloomPen Product Render" style="max-height: 65vh;">
-        </div>
-        <div>
-          <span class="section-tag reveal">Sustainable Engineering</span>
-          <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 2rem;">Designed to give back to the Earth.</h2>
-          <div class="feature-cards">
-            <div class="card reveal delay-2">
-              <h4>Recycled Wood</h4>
-              <p>Sourced purely from post-industrial cedar fragments without harming standing forests.</p>
+    <!-- Professional Header -->
+    <header>
+        <div class="header-container">
+            <div class="brand-logo">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <div class="brand-text">
+                    <h1>S & A Tuitions</h1>
+                    <p>English Language & Grammar Assessment</p>
+                </div>
             </div>
-            <div class="card reveal delay-2">
-              <h4>Seed Capsule</h4>
-              <p>Biodegradable cellulose tip protecting non-GMO organic botanical seeds.</p>
+            <div class="timer-badge" id="timer-box" style="display: none;">
+                <i class="fa-solid fa-clock"></i>
+                <span id="time-display">45:00</span>
             </div>
-            <div class="card reveal delay-3">
-              <h4>Sustainable Design</h4>
-              <p>Ergonomic graphite core optimized for extended writing lifespan and smooth draw.</p>
-            </div>
-            <div class="card reveal delay-3">
-              <h4>Educational Impact</h4>
-              <p>Empowering classroom innovation by turning completion into cultivation.</p>
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
+    </header>
 
-    <!-- SLIDE 4: PRODUCT DETAILS (Interactive Hotspots) -->
-    <section id="slide-4">
-    <div style="text-align: center; width: 100%;">
-    <span class="section-tag reveal">Precision Architecture</span>
-    <h2 class="reveal delay-1" style="font-size: 2.2rem; margin-bottom: 2.5rem;">Anatomy of Innovation</h2>
-    
-    <div class="details-interactive reveal delay-2" style="margin: 0 auto;">
-    <div class="details-img-container">
-    <img src="assets/59687-removebg-preview.png" alt="BloomPen Close Up">
-    
-    <!-- Hotspot 1: Graphite Nib -->
-    <div class="hotspot hs-nib"></div>
-    <div class="hotspot-card" style="top: 10%; left: 0%;">
-    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Smooth Graphite Core</h4>
-    <p style="font-size: 0.8rem;">Non-toxic, high-density graphite engineered for precision writing without breakage.</p>
-    </div>
-    
-    <!-- Hotspot 2: Wooden Body -->
-    <div class="hotspot hs-body"></div>
-    <div class="hotspot-card" style="top: 30%; left: 30%;">
-    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Sustainably Sourced Cedar</h4>
-    <p style="font-size: 0.8rem;">Chemical-free, polished natural wood body designed for comfortable grip.</p>
-    </div>
-    
-    <!-- Hotspot 3: Seed Capsule -->
-    <div class="hotspot hs-capsule"></div>
-    <div class="hotspot-card" style="top: 55%; left: 60%;">
-    <h4 style="color:var(--text-white); margin-bottom: 0.3rem;">Biodegradable Capsule</h4>
-    <p style="font-size: 0.8rem;">Activates instantly upon exposure to moisture and soil nutrients.</p>
-    </div>
-    </div>
-    </div>
-    </div>
-    </section>
-    
-    <!-- SLIDE 5 (NEW): LOGO ANIMATION EXPLANATION -->
-    <section id="slide-5">
-    <div class="video-showcase">
-    <div>
-    <span class="section-tag reveal">Brand Identity</span>
-    <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">The Genesis of VerDiA</h2>
-    <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-    A unified geometry expressing our core philosophy: combining knowledge with natural life cycles.
-    </p>
-    <p class="reveal delay-3" style="color: var(--accent-sage);">
-    "Connecting Knowledge with Nature."
-    </p>
-    </div>
-    <div class="video-frame reveal delay-2">
-    <video id="logo-meaning-video" muted playsinline preload="auto">
-    <source src="assets/721237798_1785267715441587.mp4" type="video/mp4">
-    </video>
-    </div>
-    </div>
-    </section>
-    
-    <!-- SLIDE 6: HOW IT WORKS -->
-    <section id="slide-6">
-    <div style="max-width: 1200px; width: 100%; text-align: center;">
-    <span class="section-tag reveal">User Experience</span>
-    <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Circular Journey</h2>
-    
-    <div class="process-flow">
-    <div class="process-step reveal delay-1">
-    <span class="step-num">01</span>
-    <h3 class="step-title">Write</h3>
-    <p>Use the BloomPen standardly for sketching, note-taking, and capturing ideas until it reaches its stub.</p>
-    </div>
-    <div class="process-step reveal delay-2">
-    <span class="step-num">02</span>
-    <h3 class="step-title">Plant</h3>
-    <p>Insert the green capsule stub directly into moist soil at a 45-degree angle in sunlight.</p>
-    </div>
-    <div class="process-step reveal delay-3">
-    <span class="step-num">03</span>
-    <h3 class="step-title">Grow</h3>
-    <p>Water regularly. The capsule dissolves within 48 hours, sprouting vibrant herbs or flora.</p>
-    </div>
-    </div>
-    </div>
-    </section>
-    
-    <!-- SLIDE 7: GROWTH STORY (Video Segment) -->
-    <section id="slide-7">
-    <div class="video-showcase">
-    <div>
-    <span class="section-tag reveal">Life Cycle Transformation</span>
-    <h2 class="reveal delay-1" style="font-size: 2.8rem; margin-bottom: 1.5rem;">From Thought to Living Nature.</h2>
-    <p class="reveal delay-2" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-    Watch the transition unfold. When your pencil reaches the end of its functional life, its secondary journey begins.
-    </p>
-    <p class="reveal delay-3" style="color: var(--accent-sage);">
-    "Decomposition gives way to living flora."
-    </p>
-    </div>
-    <div class="video-frame reveal delay-2">
-    <video id="growth-video" muted playsinline preload="auto">
-    <source src="assets/634969515_1785227179024768.mp4" type="video/mp4">
-    </video>
-    </div>
-    </div>
-    </section>
-    
-    <!-- SLIDE 8: PACKAGING EXPERIENCE -->
-    <section id="slide-8">
-    <div class="packaging-layout">
-    <div class="reveal">
-    <img src="assets/59829.png" alt="VerDiA Packaging Kit" style="max-height: 60vh;">
-    </div>
-    <div>
-    <span class="section-tag reveal">Unboxing Innovation</span>
-    <h2 class="reveal delay-1" style="font-size: 2.5rem; margin-bottom: 1.5rem;">The VerDiA Growth Kit</h2>
-    <p class="reveal delay-2" style="margin-bottom: 1.5rem;">
-    Every edition arrives in 100% biodegradable, seed-infused packaging paper. Unbox a sleek, plastic-free presentation designed to make sustainability feel luxurious.
-    </p>
-    <ul class="reveal delay-3" style="list-style: none; line-height: 2;">
-    <li>&#10003; Minimum 5 Terra Edition Pencils</li>
-    <li>&#10003; Soil Activation Guide included</li>
-    <li>&#10003; Zero synthetic adhesives or plastic foils</li>
-    </ul>
-    </div>
-    </div>
-    </section>
-    
-    <!-- SLIDE 9: WHY BLOOMPEN IS DIFFERENT (Comparison Matrix) -->
-    <section id="slide-9">
-    <div style="text-align: center; width: 100%;">
-    <span class="section-tag reveal">Market Advantage</span>
-    <h2 class="reveal delay-1" style="font-size: 2.5rem;">Why BloomPen Matters</h2>
-    
-    <div class="comparison-grid reveal delay-2" style="margin: 0 auto;">
-    <div class="comp-card bad">
-    <h3><span style="color: #FF6B6B;">&#10007;</span> Traditional Pencil</h3>
-    <ul class="comp-list">
-    <li><span style="color: #FF6B6B;">&bull;</span> Extracted from virgin timber forests</li>
-    <li><span style="color: #FF6B6B;">&bull;</span> Ends as landfilled toxic stub waste</li>
-    <li><span style="color: #FF6B6B;">&bull;</span> Synthetic rubber and metal ferrules</li>
-    <li><span style="color: #FF6B6B;">&bull;</span> Linear consumable mindset</li>
-    </ul>
-    </div>
-    <div class="comp-card good">
-    <h3><span style="color: var(--accent-sage);">&#10004;</span> BloomPen Terra</h3>
-    <ul class="comp-list">
-    <li><span style="color: var(--accent-sage);">&bull;</span> Reclaimed cedar & non-toxic lead</li>
-    <li><span style="color: var(--accent-sage);">&bull;</span> Grows into organic flora after use</li>
-    <li><span style="color: var(--accent-sage);">&bull;</span> 100% compostable capsule core</li>
-    <li><span style="color: var(--accent-sage);">&bull;</span> Circular regenerative ecosystem</li>
-    </ul>
-    </div>
-    </div>
-    </div>
-    </section>
-    
-    <!-- SLIDE 10: BRAND STORY & LOGO DNA -->
-    <section id="slide-10">
-    <div style="text-align: center; max-width: 1100px; width: 100%;">
-    <span class="section-tag reveal">Identity Architecture</span>
-    <h2 class="reveal delay-1" style="font-size: 2.5rem;">The Meaning Behind Our Logo</h2>
-    
-    <div class="brand-story-grid">
-    <div class="dna-item reveal delay-1">
-    <span class="dna-icon">&#9997;</span>
-    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Pencil Nib</h3>
-    <p style="font-size: 0.9rem;">Symbolizing <strong>Knowledge</strong>, creativity, human expression, and education.</p>
-    </div>
-    <div class="dna-item reveal delay-2">
-    <span class="dna-icon">&#127811;</span>
-    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Leaves</h3>
-    <p style="font-size: 0.9rem;">Symbolizing <strong>Nature</strong>, environmental responsibility, and ecological balance.</p>
-    </div>
-    <div class="dna-item reveal delay-3">
-    <span class="dna-icon">&#127793;</span>
-    <h3 style="margin-bottom: 0.5rem; color: var(--text-white);">Seed</h3>
-    <p style="font-size: 0.9rem;">Symbolizing <strong>Growth</strong>, potential, future impact, and regenerative design.</p>
-    </div>
-    </div>
-    </div>
-    </section>
-    
-    <!-- SLIDE 11: FINAL VISION -->
-    <section id="slide-11">
-    <div class="final-content">
-    <img src="assets/Picsart_26-07-28_00-56-51-694.png" alt="VerDiA Logo" class="final-logo reveal">
-    <h2 class="final-quote reveal delay-1">"Every idea has the power to grow."</h2>
-    <p class="reveal delay-2" style="font-size: 1.2rem; color: var(--accent-sage-light); margin-bottom: 2rem;">
-    Thank you. Join us in shaping a regenerative future.
-    </p>
-    <span class="section-tag reveal delay-3" style="letter-spacing: 0.4em;">VerDiA &bull; Student Innovation 2026</span>
-    </div>
-    </section>
-    
-    </main>
-    
-    <!-- ==========================================================================
-    JAVASCRIPT: CONTROLS, ANIMATIONS & STAGE MECHANICS
-    ========================================================================== -->
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-    // Elements
-    const introOverlay = document.getElementById('intro-overlay');
-    const introVideo = document.getElementById('intro-video');
-    const skipBtn = document.getElementById('skip-btn');
-    const container = document.getElementById('scroll-container');
-    const sections = document.querySelectorAll('section');
-    const hudCounter = document.getElementById('hud-counter');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const logoMeaningVideo = document.getElementById('logo-meaning-video');
-    const growthVideo = document.getElementById('growth-video');
-    
-    let currentIndex = 0;
-    let isMuted = false;
-    
-    /* ----------------------------------------------------------------------
-    1. INTRO OVERLAY LOGIC (Auto-fade + Manual Skip Button)
-    ---------------------------------------------------------------------- */
-    const dismissIntro = () => {
-    if (!introOverlay.classList.contains('fade-out')) {
-    introOverlay.classList.add('fade-out');
-    setTimeout(() => introOverlay.remove(), 1200);
-    }
-    };
-    
-    // Auto dismiss after 6.5 seconds max
-    const autoSkipTimer = setTimeout(dismissIntro, 6500);
-    
-    // Dismiss on video end
-    if (introVideo) {
-    introVideo.addEventListener('ended', dismissIntro);
-    }
-    
-    // Manual dismiss on button click or background click
-    if (skipBtn) {
-    skipBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    clearTimeout(autoSkipTimer);
-    dismissIntro();
-    });
-    }
-    
-    introOverlay.addEventListener('click', () => {
-    clearTimeout(autoSkipTimer);
-    dismissIntro();
-    });
-    
-    /* ----------------------------------------------------------------------
-    2. NAVIGATION & HUD UPDATES
-    ---------------------------------------------------------------------- */
-    const updateHUD = (index) => {
-    const formattedCurrent = String(index + 1).padStart(2, '0');
-    const formattedTotal = String(sections.length).padStart(2, '0');
-    hudCounter.textContent = `${formattedCurrent} / ${formattedTotal}`;
-    };
-    
-    const navigateToSlide = (index) => {
-    if (index < 0 || index >= sections.length) return;
-    currentIndex = index;
-    sections[currentIndex].scrollIntoView({ behavior: 'smooth' });
-    };
-    
-    prevBtn.addEventListener('click', () => navigateToSlide(currentIndex - 1));
-    nextBtn.addEventListener('click', () => navigateToSlide(currentIndex + 1));
-    
-    /* ----------------------------------------------------------------------
-    3. OBSERVER FOR SECTION ANIMATIONS & VIDEO TRIGGERING
-    ---------------------------------------------------------------------- */
-    const observerOptions = {
-    root: container,
-    threshold: 0.5
-    };
-    
-    const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-    if (entry.isIntersecting) {
-    entry.target.classList.add('active');
-    
-    // Find index of current active slide
-    const index = Array.from(sections).indexOf(entry.target);
-    currentIndex = index;
-    updateHUD(index);
-    
-    // Handle Slide 5 Video (Logo Meaning)
-    if (entry.target.id === 'slide-5' && logoMeaningVideo) {
-    logoMeaningVideo.currentTime = 0;
-    logoMeaningVideo.play().catch(e => console.log('Autoplay blocked:', e));
-    }
-    
-    // Handle Slide 7 Video (Growth Story)
-    if (entry.target.id === 'slide-7' && growthVideo) {
-    growthVideo.currentTime = 0;
-    growthVideo.play().catch(e => console.log('Autoplay blocked:', e));
-    }
-    } else {
-    // Pause videos when leaving respective sections
-    if (entry.target.id === 'slide-5' && logoMeaningVideo) {
-    logoMeaningVideo.pause();
-    }
-    if (entry.target.id === 'slide-7' && growthVideo) {
-    growthVideo.pause();
-    }
-    }
-    });
-    }, observerOptions);
-    
-    sections.forEach(section => sectionObserver.observe(section));
-    
-    /* ----------------------------------------------------------------------
-    4. KEYBOARD SHORTCUTS (STAGE PRESENTER CONTROLS)
-    ---------------------------------------------------------------------- */
-    document.addEventListener('keydown', (e) => {
-    // Skip intro on Space key if active
-    if (!introOverlay.classList.contains('fade-out') && (e.code === 'Space' || e.code === 'Enter')) {
-    e.preventDefault();
-    clearTimeout(autoSkipTimer);
-    dismissIntro();
-    return;
-    }
-    
-    switch (e.code) {
-    case 'ArrowDown':
-    case 'ArrowRight':
-    case 'Space':
-    e.preventDefault();
-    navigateToSlide(currentIndex + 1);
-    break;
-    
-    case 'ArrowUp':
-    case 'ArrowLeft':
-    e.preventDefault();
-    navigateToSlide(currentIndex - 1);
-    break;
-    
-    case 'KeyP': // [P] Toggle Play/Pause on current video
-    e.preventDefault();
-    const activeVideo = sections[currentIndex].querySelector('video');
-    if (activeVideo) {
-    if (activeVideo.paused) {
-    activeVideo.play().catch(err => console.log(err));
-    } else {
-    activeVideo.pause();
-    }
-    }
-    break;
-    
-    case 'KeyF': // [F] Toggle Fullscreen Mode
-    e.preventDefault();
-    if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(err => console.log(err));
-    } else {
-    document.exitFullscreen().catch(err => console.log(err));
-    }
-    break;
-    
-    case 'KeyM': // [M] Toggle Audio Mute across all videos
-    e.preventDefault();
-    isMuted = !isMuted;
-    if (logoMeaningVideo) logoMeaningVideo.muted = isMuted;
-    if (growthVideo) growthVideo.muted = isMuted;
-    if (introVideo) introVideo.muted = isMuted;
-    break;
-    
-    case 'KeyR': // [R] Restart Presentation
-    e.preventDefault();
-    navigateToSlide(0);
-    break;
-    }
-    });
-    });
-    </script>
-    </body>
-    </html>           });
+    <!-- Main Container Content -->
+    <div class="main-wrapper">
+        
+        <!-- WELCOME SCREEN -->
+        <div class="card" id="welcome-screen">
+            <h2>Grade 6 English Master Assessment</h2>
+            <p class="subtitle">Comprehensive 50-Question Test (Units 1, 2 & 3)</p>
+            
+            <div class="instructions-box">
+                <h4><i class="fa-solid fa-circle-info"></i> Examination Instructions:</h4>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Total Questions: 50 MCQs covering Grammar, Vocabulary, and Comprehension across Units 1, 2, and 3.</li>
+                    <li><i class="fa-solid fa-check"></i> Time Limit: Exactly 45 Minutes real-time countdown.</li>
+                    <li><i class="fa-solid fa-check"></i> Teacher Monitoring Active: Live score telemetry & progress tracking enabled for mentor view.</li>
+                    <li><i class="fa-solid fa-check"></i> Detailed Feedback: Post-test error review with correct option breakdowns and full grammatical explanations!</li>
+                </ul>
+            </div>
+
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="candidate-name"><i class="fa-solid fa-user-graduate"></i> Student Full Name</label>
+                    <input type="text" id="candidate-name" placeholder="Enter student name here..." required autocomplete="off">
+                </div>
+                <button type="submit" class="btn-luxury">
+                    Start English Examination <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- QUIZ INTERFACE -->
+        <div class="card" id="quiz-screen">
+            <div class="quiz-progress-bar">
+                <div class="quiz-progress-fill" id="progress-bar-fill"></div>
+            </div>
+
+            <div class="question-meta">
+                <span id="question-tracker">Question 1 of 50</span>
+                <span id="question-chapter-tag" style="color: var(--accent); font-weight: 700;">Unit 1: Where We Live Now</span>
+            </div>
+
+            <h3 class="question-title" id="question-text">Loading question text...</h3>
+
+            <div class="options-grid" id="options-container">
+                <!-- Options rendered dynamically -->
+            </div>
+
+            <div class="quiz-navigation">
+                <button class="btn-nav" id="prev-btn" onclick="prevQuestion()" disabled>
+                    <i class="fa-solid fa-arrow-left"></i> Previous
+                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-nav" id="next-btn" onclick="nextQuestion()">
+                        Next <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button class="btn-submit-quiz" id="submit-btn" onclick="confirmSubmission()" style="display: none;">
+                        Submit Assessment <i class="fa-solid fa-check"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS SCREEN -->
+        <div class="card" id="results-screen">
+            <div class="results-header-container">
+                <div class="results-header-icon">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h2>Assessment Completed</h2>
+                <p class="subtitle">Review telemetry analytics and student mistake corrections below.</p>
+            </div>
+            
+            <div class="candidate-summary" id="result-candidate-info">
+                Candidate: Student Name
+            </div>
+
+            <!-- Teacher Live Telemetry Monitor Box -->
+            <div class="teacher-monitor-box">
+            <h4><i class="fa-solid fa-chalkboard-user"></i> Mentor Live Telemetry & Audit Report</h4>
+            <p id="live-telemetry-text">Live tracking complete. Student completed the assessment within allocated time parameters. All live marks recorded successfully.</p>
+            </div>
+            
+            <div class="score-card-container">
+            <div class="score-metric-card">
+            <h3 id="res-score">0 / 50</h3>
+            <p>Total Marks</p>
+            </div>
+            <div class="score-metric-card">
+            <h3 id="res-percentage">0%</h3>
+            <p>Percentage</p>
+            </div>
+            <div class="score-metric-card">
+            <h3 id="res-status" style="color: var(--success);">Passed</h3>
+            <p>Final Status</p>
+            </div>
+            </div>
+            
+            <!-- Detailed Missed Questions Review Section -->
+            <h3 class="review-section-title"><i class="fa-solid fa-book-open-reader"></i> Teacher Review: Error Analysis & Explanations</h3>
+            <div id="mistakes-review-container">
+            <!-- Injected via JS -->
+            </div>
+            
+            <button class="btn-luxury" onclick="location.reload()" style="margin-top: 2rem;">
+            <i class="fa-solid fa-rotate-right"></i> Start New Session
+            </button>
+            </div>
+            
+            </div>
+            
+            <!-- Footer -->
+            <footer>
+            <p>&copy; 2026 S & A Tuitions (Cambridge Section). All Rights Reserved. English Department Professional Platform.</p>
+            </footer>
+            
+            <!-- JavaScript Engine with Live Mentor Tracking & Detailed Explanations -->
+            <script>
+            // Master Question Bank: 50 Questions covering Unit 1, 2, and 3
+            const masterQuestions = [
+            // UNIT 1: "Where We Live Now" (Grammar & Vocab)
+            {
+            q: "Which word in the sentence is a verb?\n\"The children played in the park.\"",
+            options: ["children", "played", "park", "the"],
+            answer: 1,
+            chapter: "Unit 1: Parts of Speech",
+            explanation: "'Played' is an action word, making it the verb in this sentence."
+            },
+            {
+            q: "Identify the compound adjective in this sentence:\n\"He works in a well-known company.\"",
+            options: ["works in", "company", "well-known", "he works"],
+            answer: 2,
+            chapter: "Unit 1: Compound Adjectives",
+            explanation: "'Well-known' is a compound adjective formed by joining two words with a hyphen to modify the noun company."
+            },
+            {
+            q: "In the sentence, \"The barking dog woke the neighbors,\" what is \"barking\"?",
+            options: ["Gerund", "Present Participle", "Preposition", "Conjunction"],
+            answer: 1,
+            chapter: "Unit 1: Participles",
+            explanation: "'Barking' functions as an adjective modifying the noun 'dog', which makes it a present participle."
+            },
+            {
+            q: "In the sentence, \"Swimming is my favorite hobby,\" what is \"Swimming\"?",
+            options: ["Present Participle", "Gerund", "Infinitive", "Verb"],
+            answer: 1,
+            chapter: "Unit 1: Gerunds",
+            explanation: "'Swimming' is an -ing form acting as the subject noun of the sentence, which is a gerund."
+            },
+            {
+            q: "Choose the correct conjunction:\n\"She wanted to go for a walk, ___ it started to rain.\"",
+            options: ["so", "but", "because", "or"],
+            answer: 1,
+            chapter: "Unit 1: Conjunctions",
+            explanation: "'But' is used to connect two contrasting clauses (wanting to go vs. rain starting)."
+            },
+            {
+            q: "Identify the type of sentence:\n\"Please close the door quietly.\"",
+            options: ["Assertive / Declarative", "Interrogative", "Imperative", "Exclamatory"],
+            answer: 2,
+            chapter: "Unit 1: Sentence Types",
+            explanation: "An imperative sentence gives a request, command, or instruction."
+            },
+            {
+            q: "Identify the type of sentence:\n\"What a beautiful sunset!\"",
+            options: ["Imperative", "Exclamatory", "Interrogative", "Declarative"],
+            answer: 1,
+            chapter: "Unit 1: Sentence Types",
+            explanation: "An exclamatory sentence expresses strong emotion and ends with an exclamation mark."
+            },
+            {
+            q: "Which tense is used here?\n\"She writes a story every weekend.\"",
+            options: ["Simple Past Tense", "Simple Present Tense", "Present Continuous Tense", "Simple Future Tense"],
+            answer: 1,
+            chapter: "Unit 1: Tenses",
+            explanation: "'Writes' indicates a regular habit or routine, which is the simple present tense."
+            },
+            {
+            q: "Complete the sentence with the correct simple future form:\n\"We ___ the zoo next Sunday.\"",
+            options: ["visited", "visit", "will visit", "visiting"],
+            answer: 2,
+            chapter: "Unit 1: Tenses",
+            explanation: "'Will visit' expresses an action scheduled to happen in the future."
+            },
+            {
+            q: "Choose the simple past form of \"teach\":",
+            options: ["Teached", "Taught", "Teaching", "Will teach"],
+            answer: 1,
+            chapter: "Unit 1: Irregular Verbs",
+            explanation: "'Taught' is the correct irregular simple past tense form of 'teach'."
+            },
+            {
+            q: "Living alone in a remote area without modern facilities is often called living in the:",
+            options: ["City", "Wilderness", "Suburb", "Market"],
+            answer: 1,
+            chapter: "Unit 1: Vocabulary",
+            explanation: "Living in the 'wilderness' refers to remote, natural, unpopulated areas without modern city amenities."
+            },
+            {
+            q: "Which word means \"a person who lives in a specific place\"?",
+            options: ["Visitor", "Inhabitant", "Traveler", "Tourist"],
+            answer: 1,
+            chapter: "Unit 1: Vocabulary",
+            explanation: "An 'inhabitant' is a permanent resident or person living in a given place."
+            },
+            {
+            q: "Which word is a synonym for \"shelter\"?",
+            options: ["Danger", "Refuge / Protection", "Food", "Journey"],
+            answer: 1,
+            chapter: "Unit 1: Vocabulary",
+            explanation: "A 'refuge' provides shelter, safety, and protection from harm."
+            },
+            {
+            q: "What is a \"lucky escape\"?",
+            options: ["Winning a game", "Narrowly avoiding danger or disaster", "Planning a holiday", "Losing something valuable"],
+            answer: 1,
+            chapter: "Unit 1: Vocabulary",
+            explanation: "A lucky escape means narrowly dodging a dangerous or hazardous situation safely."
+            },
+            {
+            q: "An account written about a personal experience in sequence is called a:",
+            options: ["Narrative writing", "Formal letter", "Summary", "Poem"],
+            answer: 0,
+            chapter: "Unit 1: Writing",
+            explanation: "Narrative writing tells a story or recounts personal experiences in chronological sequence."
+            },
+            
+            // UNIT 2: "The Sea" (Grammar & Vocab)
+            {
+            q: "How many syllables are in the word \"Beautiful\"?",
+            options: ["2", "3", "4", "1"],
+            answer: 1,
+            chapter: "Unit 2: Syllables",
+            explanation: "Beau-ti-ful is broken into 3 distinct spoken syllable beats."
+            },
+            {
+            q: "How many syllables are in the word \"Ocean\"?",
+            options: ["1", "2", "3", "4"],
+            answer: 1,
+            chapter: "Unit 2: Syllables",
+            explanation: "O-cean has 2 spoken syllables."
+            },
+            {
+            q: "Choose the correct comparative degree:\n\"The Pacific Ocean is ___ than the Arctic Ocean.\"",
+            options: ["deep", "deeper", "deepest", "more deep"],
+            answer: 1,
+            chapter: "Unit 2: Adjectives",
+            explanation: "Comparatives comparing two items use '-er' ('deeper')."
+            },
+            {
+            q: "Choose the correct superlative degree:\n\"Everest is the ___ mountain peak in the world.\"",
+            options: ["high", "higher", "highest", "most high"],
+            answer: 2,
+            chapter: "Unit 2: Adjectives",
+            explanation: "Superlatives comparing a noun against all others use '-est' ('highest')."
+            },
+            {
+            q: "Which sentence uses correct direct speech punctuation?",
+            options: [
+            "He said, \"I love swimming.\"",
+            "He said \"I love swimming\".",
+            "He said, I love swimming.",
+            "\"He said, I love swimming\""
+            ],
+            answer: 0,
+            chapter: "Unit 2: Direct Speech",
+            explanation: "Direct speech requires a comma after the reporting verb and quotation marks enclosing the spoken words with terminal punctuation inside."
+            },
+            {
+            q: "Identify the tense:\n\"The shark was swimming near the shore.\"",
+            options: ["Present Progressive", "Past Progressive", "Future Progressive", "Simple Past"],
+            answer: 1,
+            chapter: "Unit 2: Tenses",
+            explanation: "'Was swimming' uses past auxiliary 'was' + -ing verb, representing past progressive."
+            },
+            {
+            q: "Complete the future progressive sentence:\n\"At 5 PM tomorrow, we ___ across the lake.\"",
+            options: ["will sail", "will be sailing", "sailed", "are sailing"],
+            answer: 1,
+            chapter: "Unit 2: Tenses",
+            explanation: "Future progressive uses 'will be' + verb-ing ('will be sailing')."
+            },
+            {
+            q: "Which phrase introduces direct reporting words correctly?",
+            options: ["Said she, \"Wait for me!\"", "She said, \"Wait for me!\"", "She \"said wait for me!\"", "She said wait, \"for me!\""],
+            answer: 1,
+            chapter: "Unit 2: Direct Speech",
+            explanation: "Subject + reporting verb + comma + quotation marks is the correct English structure."
+            },
+            {
+            q: "A sudden, unexpected meeting with a dangerous marine animal is called an:",
+            options: ["Encounter", "Excursion", "Expedition", "Escape"],
+            answer: 0,
+            chapter: "Unit 2: Vocabulary",
+            explanation: "An 'encounter' is a sudden or unexpected meeting."
+            },
+            {
+            q: "Sharks are classified as marine:",
+            options: ["Mammals", "Predators", "Herbivores", "Insects"],
+            answer: 1,
+            chapter: "Unit 2: Vocabulary",
+            explanation: "Sharks are aquatic carnivorous predators."
+            },
+            {
+            q: "Which word describes extremely large ocean waves?",
+            options: ["Ripples", "Tides", "Tremendous / Giant waves", "Currents"],
+            answer: 2,
+            chapter: "Unit 2: Vocabulary",
+            explanation: "Tremendous or giant waves represent massive oceanic swells."
+            },
+            {
+            q: "What is the main purpose of writing a text summary?",
+            options: ["To add extra imaginary details", "To state the main points briefly", "To rewrite every single line", "To list all difficult spelling words"],
+            answer: 1,
+            chapter: "Unit 2: Comprehension Skills",
+            explanation: "A summary condenses a text to capture only its core main points concisely."
+            },
+            {
+            q: "Which sensory word relates to the sea sound?",
+            options: ["Roaring waves", "Bright sun", "Salty water", "Rough sand"],
+            answer: 0,
+            chapter: "Unit 2: Sensory Imagery",
+            explanation: "'Roaring' appeals directly to the sense of sound (auditory imagery)."
+            },
+            
+            // UNIT 3: "The Red Letter Day" (Grammar, Vocab & Letter Writing)
+            {
+            q: "Which word in this sentence is an adverb?\n\"The sailor moved carefully on the slippery deck.\"",
+            options: ["sailor", "moved", "carefully", "slippery"],
+            answer: 2,
+            chapter: "Unit 3: Adverbs",
+            explanation: "'Carefully' describes how the action was performed, making it an adverb of manner."
+            },
+            {
+            q: "What type of adverb is \"yesterday\" in \"We met yesterday\"?",
+            options: ["Adverb of Manner", "Adverb of Place", "Adverb of Time", "Adverb of Frequency"],
+            answer: 2,
+            chapter: "Unit 3: Adverbs",
+            explanation: "'Yesterday' specifies when an action occurred, which is an adverb of time."
+            },
+            {
+            q: "Identify the qualifier in this sentence:\n\"The test was extremely difficult.\"",
+            options: ["test", "was", "extremely", "difficult"],
+            answer: 2,
+            chapter: "Unit 3: Qualifiers",
+            explanation: "'Extremely' is a qualifier that intensifies the adjective 'difficult'."
+            },
+            {
+            q: "Identify the present perfect tense sentence:",
+            options: ["She writes a letter.", "She wrote a letter.", "She has written a letter.", "She will write a letter."],
+            answer: 2,
+            chapter: "Unit 3: Perfect Tenses",
+            explanation: "Present perfect uses 'has/have' + past participle ('has written')."
+            },
+            {
+            q: "Complete with the past perfect tense:\n\"Before the rain started, they ___ their work.\"",
+            options: ["finished", "had finished", "have finished", "will have finished"],
+            answer: 1,
+            chapter: "Unit 3: Perfect Tenses",
+            explanation: "Past perfect uses 'had' + past participle ('had finished') to show an action completed before another in the past."
+            },
+            {
+            q: "Complete with the future perfect tense:\n\"By next month, I ___ my sixth-grade exams.\"",
+            options: ["will finish", "will have finished", "finished", "have finished"],
+            answer: 1,
+            chapter: "Unit 3: Perfect Tenses",
+            explanation: "Future perfect uses 'will have' + past participle ('will have finished')."
+            },
+            {
+            q: "Words that sound the same but have different spellings and meanings (e.g., sea / see) are called:",
+            options: ["Homographs", "Homophones", "Synonyms", "Antonyms"],
+            answer: 1,
+            chapter: "Unit 3: Homophones",
+            explanation: "Homophones sound identical but differ in spelling and meaning."
+            },
+            {
+            q: "Words that have the same spelling but different meanings (e.g., bark of a tree / dog's bark) are called:",
+            options: ["Homophones", "Homographs", "Acronyms", "Prefix"],
+            answer: 1,
+            chapter: "Unit 3: Homographs",
+            explanation: "Homographs share identical spelling but have different meanings and sometimes pronunciation."
+            },
+            {
+            q: "Choose the correct homophone pair:\n\"I can ___ the blue ___ from the cliff.\"",
+            options: ["see / sea", "sea / see", "see / see", "sea / sea"],
+            answer: 0,
+            chapter: "Unit 3: Homophones",
+            explanation: "'See' (vision) and 'sea' (ocean) correctly complete the sentence."
+            },
+            {
+            q: "Which letter is silent in the word \"Climb\"?",
+            options: ["c", "l", "i", "b"],
+            answer: 3,
+            chapter: "Unit 3: Silent Letters",
+            explanation: "The letter 'b' at the end of 'climb' is silent."
+            },
+            {
+            q: "Which letter is silent in the word \"Knight\"?",
+            options: ["k", "n", "i", "t"],
+            answer: 0,
+            chapter: "Unit 3: Silent Letters",
+            explanation: "The initial 'k' in 'knight' is silent."
+            },
+            {
+            q: "Which letter is silent in the word \"Listen\"?",
+            options: ["l", "s", "t", "n"],
+            answer: 2,
+            chapter: "Unit 3: Silent Letters",
+            explanation: "The middle 't' in 'listen' is not pronounced."
+            },
+            {
+            q: "Which letter is silent in the word \"Write\"?",
+            options: ["w", "r", "i", "t"],
+            answer: 0,
+            chapter: "Unit 3: Silent Letters",
+            explanation: "The initial 'w' in 'write' is silent."
+            },
+            {
+            q: "Which letter is silent in the word \"Honest\"?",
+            options: ["h", "o", "n", "t"],
+            answer: 0,
+            chapter: "Unit 3: Silent Letters",
+            explanation: "The initial 'h' in 'honest' is silent."
+            },
+            {
+            q: "Which letter is silent in the word \"Walk\"?",
+            options: ["w", "a", "l", "k"],
+            answer: 2,
+            chapter: "Unit 3: Silent Letters",
+            explanation: "The middle 'l' in 'walk' is silent."
+            },
+            {
+            q: "Which letter is silent in the word \"Two\"?",
+            options: ["t", "w", "o", "None"],
+            answer: 1,
+            chapter: "Unit 3: Silent Letters",
+            explanation: "The letter 'w' in 'two' is silent."
+            },
+            {
+            q: "Choose the suffix that can be added to \"Happy\" to make an abstract noun:",
+            options: ["-ful", "-ness", "-less", "-ing"],
+            answer: 1,
+            chapter: "Unit 3: Suffixes",
+            explanation: "Adding '-ness' transforms the adjective 'happy' into the noun 'happiness'."
+            },
+            {
+            q: "Choose the prefix that means \"not\" in the word \"Unhappy\":",
+            options: ["-happy", "un-", "dis-", "im-"],
+            answer: 1,
+            chapter: "Unit 3: Prefixes",
+            explanation: "The prefix 'un-' reverses the meaning to form the antonym."
+            },
+            {
+            q: "What does the idiom \"A Red Letter Day\" mean?",
+            options: ["A day full of danger", "A very important or memorable day", "A rainy day", "A day spent writing letters"],
+            answer: 1,
+            chapter: "Unit 3: Idioms & Vocabulary",
+            explanation: "A 'red-letter day' denotes a notably joyful, significant, or memorable occasion."
+            },
+            {
+            q: "In formal letter writing to a Principal, what is the standard salutation?",
+            options: ["Hey Principal!", "Respected Principal / Dear Principal,", "Hello Buddy,", "To whom it may concern only"],
+            answer: 1,
+            chapter: "Unit 3: Formal Letter Writing",
+            explanation: "Formal letters to school administration require respectful salutations like 'Respected Principal' or 'Dear Principal'."
+            },
+            {
+            q: "What comes at the end of a formal letter before your signature?",
+            options: ["Yours sincerely / Yours obediently", "Best wishes forever", "Bye bye", "See you soon"],
+            answer: 0,
+            chapter: "Unit 3: Formal Letter Writing",
+            explanation: "Standard formal sign-offs include 'Yours sincerely' or 'Yours obediently'."
+            },
+            {
+            q: "In comprehension, a \"red letter day\" usually refers to an occasion marked by:",
+            options: ["Sadness and loss", "Joy, honor, or significant accomplishment", "Everyday routine activities", "A bad weather forecast"],
+            answer: 1,
+            chapter: "Unit 3: Comprehension",
+            explanation: "It signifies momentous occasions marked by celebration, success, or honor."
+            }
+            ];
+            
+            let shuffledQuiz = [];
+            let currentQuestionIndex = 0;
+            let userAnswers = {};
+            let candidateName = '';
+            let timerInterval = null;
+            let timeRemaining = 45 * 60; // 45 Minutes
+            
+            // Handle Registration form submission
+            document.getElementById('registration-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('candidate-name').value.trim();
+            
+            if(!nameInput) {
+            alert('Please enter the student name to proceed.');
+            return;
+            }
+            
+            candidateName = nameInput;
+            
+            // Randomize questions using Fisher-Yates shuffle algorithm
+            shuffledQuiz = [...masterQuestions].sort(() => Math.random() - 0.5);
+            
+            // Transition UI
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            document.getElementById('timer-box').style.display = 'flex';
+            
+            startTimer();
+            loadQuestion();
+            });
+            
+            // Real-time Countdown Timer
+            let timeSpentSeconds = 0;
+            function startTimer() {
+            timerInterval = setInterval(() => {
+            if(timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert('Time is up! Your English assessment is now automatically submitting.');
+            submitQuiz();
+            return;
+            }
+            timeRemaining--;
+            timeSpentSeconds++;
+            let minutes = Math.floor(timeRemaining / 60);
+            let seconds = timeRemaining % 60;
+            document.getElementById('time-display').innerText = 
+            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }, 1000);
+            }
+            
+            // Load Question Function
+            function loadQuestion() {
+            const qObj = shuffledQuiz[currentQuestionIndex];
+            
+            // Progress Bar Update
+            let progressPercent = ((currentQuestionIndex + 1) / shuffledQuiz.length) * 100;
+            document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
+            
+            // Tracker & Chapter tag
+            document.getElementById('question-tracker').innerText = `Question ${currentQuestionIndex + 1} of ${shuffledQuiz.length}`;
+            document.getElementById('question-chapter-tag').innerText = qObj.chapter;
+            document.getElementById('question-text').innerText = qObj.q;
+            
+            // Render Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            qObj.options.forEach((optText, index) => {
+            const isSelected = userAnswers[currentQuestionIndex] === index;
+            const label = document.createElement('label');
+            label.className = `option-label ${isSelected ? 'selected' : ''}`;
+            label.innerHTML = `
+            <input type="radio" name="question-option" value="${index}" ${isSelected ? 'checked' : ''} onchange="selectOption(${index})">
+            <span>${String.fromCharCode(65 + index)}) ${optText}</span>
+            `;
+            optionsContainer.appendChild(label);
+            });
+            
+            // Button visibility controls
+            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+            if(currentQuestionIndex === shuffledQuiz.length - 1) {
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('submit-btn').style.display = 'block';
+            } else {
+            document.getElementById('next-btn').style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+            }
+            }
+            
+            // Record user selection
+            function selectOption(optionIndex) {
+            userAnswers[currentQuestionIndex] = optionIndex;
+            const labels = document.querySelectorAll('.option-label');
+            labels.forEach((lbl, idx) => {
+            if(idx === optionIndex) {
+            lbl.classList.add('selected');
+            } else {
+            lbl.classList.remove('selected');
+            }
+            });
+            }
+            
+            function nextQuestion() {
+            if(currentQuestionIndex < shuffledQuiz.length - 1) {
+            currentQuestionIndex++;
+            loadQuestion();
+            }
+            }
+            
+            function prevQuestion() {
+            if(currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            loadQuestion();
+            }
+            }
+            
+            function confirmSubmission() {
+            let answeredCount = Object.keys(userAnswers).length;
+            let unassigned = shuffledQuiz.length - answeredCount;
+            let msg = unassigned > 0 ? 
+            `You have left ${unassigned} question(s) unanswered. Are you sure you want to submit?` : 
+            `Are you sure you want to finalize and submit this English assessment?`;
+            
+            if(confirm(msg)) {
+            submitQuiz();
+            }
+            }
+            
+            // Evaluation & Detailed Mistake Review Generation with Teacher Telemetry Feedback
+            function submitQuiz() {
+            clearInterval(timerInterval);
+            
+            let score = 0;
+            let mistakesList = [];
+            let minutesTaken = Math.floor(timeSpentSeconds / 60);
+            let secondsTaken = timeSpentSeconds % 60;
+            
+            shuffledQuiz.forEach((qObj, idx) => {
+            const userChoice = userAnswers[idx];
+            if(userChoice === qObj.answer) {
+            score++;
+            } else {
+            mistakesList.push({
+            qNumber: idx + 1,
+            question: qObj.q,
+            chapter: qObj.chapter,
+            userAnswer: userChoice !== undefined ? `${String.fromCharCode(65 + userChoice)}) ${qObj.options[userChoice]}` : "No Answer Provided",
+            correctAnswer: `${String.fromCharCode(65 + qObj.answer)}) ${qObj.options[qObj.answer]}`,
+            explanation: qObj.explanation
+            });
+            }
+            });
+            
+            let percentage = Math.round((score / shuffledQuiz.length) * 100);
+            let status = percentage >= 50 ? "Passed" : "Needs Revision";
+            let statusColor = percentage >= 50 ? "var(--success)" : "var(--danger)";
+            
+            // Update Results Header UI
+            document.getElementById('result-candidate-info').innerHTML = 
+            `<i class="fa-solid fa-user-graduate"></i> Candidate: <b>${escapeHtml(candidateName)}</b>`;
+            
+            // Live Mentor Telemetry Report Update
+            document.getElementById('live-telemetry-text').innerHTML = 
+            `Student <b>${escapeHtml(candidateName)}</b> completed the test in <b>${minutesTaken}m ${secondsTaken}s</b>. Total Marks Achieved: <b>${score} / 50 (${percentage}%)</b>. Status: <b>${status}</b>.`;
+            
+            document.getElementById('res-score').innerText = `${score} / ${shuffledQuiz.length}`;
+            document.getElementById('res-percentage').innerText = `${percentage}%`;
+            
+            let statusEl = document.getElementById('res-status');
+            statusEl.innerText = status;
+            statusEl.style.color = statusColor;
+            
+            // Render Detailed Mistakes / Review Breakdown
+            const reviewContainer = document.getElementById('mistakes-review-container');
+            reviewContainer.innerHTML = '';
+            
+            if(mistakesList.length === 0) {
+            reviewContainer.innerHTML = `
+            <div class="mistake-card all-correct">
+            <i class="fa-solid fa-award" style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--text-heading); margin-bottom: 0.5rem;">Flawless Grammar & Vocabulary Mastery!</h3>
+            <p style="color: #475569;">Incredible job! You answered all 50 English questions correctly without a single mistake. Outstanding command of Units 1, 2, and 3!</p>
+            </div>
+            `;
+            } else {
+            mistakesList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'mistake-card';
+            card.innerHTML = `
+            <div class="mistake-q-num">Question #${item.qNumber} &bull; ${item.chapter}</div>
+            <div class="mistake-q-text">${item.question.replace(/\n/g, '<br>')}</div>
+            <div class="mistake-details">
+            <div>Your Answer: <span class="wrong-ans">${item.userAnswer}</span></div>
+            <div>Correct Answer: <span class="correct-ans">${item.correctAnswer}</span></div>
+            </div>
+            <div class="explanation-box">
+            <b>Grammar & Context Correction:</b> ${item.explanation}
+            </div>
+            `;
+            reviewContainer.appendChild(card);
+            });
+            }
+            // Display Results Screen
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('timer-box').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'block';
+            
+            // Scroll smoothly to top of results
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
             </script>
             </body>
             </html>
